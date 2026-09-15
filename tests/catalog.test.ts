@@ -19,11 +19,11 @@ describe('buildCatalogLookup', () => {
   })
 
   it('resolves a known combination to its server-authoritative price', () => {
-    const entry = lookup.get(catalogKey('T-Shirt Uomo', 'Grigia (cotone)', 'M'))
+    const entry = lookup.get(catalogKey('Cappellino CVLT', 'Blu scuro', 'S/M'))
     expect(entry).toBeDefined()
-    expect(entry?.unitPrice).toBe(10)
+    expect(entry?.unitPrice).toBe(15)
     expect(entry?.compareAtPrice).toBe(25)
-    expect(entry?.edition).toBe('ed. 2023')
+    expect(entry?.edition).toBe('ed. 2021')
   })
 
   it('falls back to the product price when the variant has no override', () => {
