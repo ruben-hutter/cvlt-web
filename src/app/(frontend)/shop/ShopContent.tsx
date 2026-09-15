@@ -54,37 +54,6 @@ const products: Product[] = [
     ],
   },
   {
-    name: 'Maglietta Tecnica',
-    edition: 'ed. 2024 - Unisex',
-    price: 15,
-    compareAtPrice: 30,
-    image: '/shop/maglietta-tecnica-2024.png',
-    variants: [
-      { label: 'Blu (inserti bianchi)', sizes: ['S', 'L', 'XXL'] },
-      { label: 'Bianca (inserti blu)', sizes: ['S', 'L', 'XXL'] },
-    ],
-  },
-  {
-    name: 'T-Shirt Uomo',
-    edition: 'ed. 2023',
-    price: 25,
-    image: '/shop/tshirt-uomo-2023.png',
-    variants: [
-      { label: 'Grigia (cotone)', sizes: ['S', 'M', 'XL', 'XXL'], price: 10, compareAtPrice: 25 },
-      { label: 'Gialla (tecnica)', sizes: ['S', 'M', 'XL', 'XXL'], price: 15, compareAtPrice: 30 },
-    ],
-  },
-  {
-    name: 'T-Shirt Donna',
-    edition: 'ed. 2023',
-    price: 25,
-    image: '/shop/tshirt-donna-2023.png',
-    variants: [
-      { label: 'Grigia (cotone)', sizes: ['M', 'L'], price: 10, compareAtPrice: 25 },
-      { label: 'Gialla (tecnica)', sizes: ['M', 'L'], price: 15, compareAtPrice: 30 },
-    ],
-  },
-  {
     name: 'Giacca Fleece Uomo',
     edition: 'ed. 2023',
     price: 55,
