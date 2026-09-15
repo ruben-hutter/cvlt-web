@@ -11,7 +11,6 @@ export function organizationJsonLd(baseUrl: string) {
     url: baseUrl,
     logo: `${baseUrl}/logo_CVLT.png`,
     foundingDate: '1987',
-    email: 'info@cvlt.ch',
     address: {
       '@type': 'PostalAddress',
       addressRegion: 'Ticino',

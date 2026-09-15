@@ -1,4 +1,6 @@
 import { ContactForm } from './ContactForm'
+import { ObfuscatedEmailLink } from '../components/ObfuscatedEmailLink'
+import { CLUB_EMAIL_ENCODED } from '@/lib/obfuscate'
 
 export const metadata = {
   title: 'Contatto',
@@ -15,7 +17,11 @@ export default function ContactPage() {
       <p className="mt-4 text-cvlt-gray-700">
         Per qualsiasi domanda o informazione, non esitare a contattarci
         tramite il modulo qui sotto oppure scrivici direttamente a{' '}
-        <a href="mailto:info@cvlt.ch" className="font-medium text-cvlt-blue hover:text-cvlt-blue-dark hover:underline">info@cvlt.ch</a>.
+        <ObfuscatedEmailLink
+          encoded={CLUB_EMAIL_ENCODED}
+          className="font-medium text-cvlt-blue hover:text-cvlt-blue-dark hover:underline"
+        />
+        .
       </p>
 
       <div className="mx-auto mt-6 max-w-2xl">
