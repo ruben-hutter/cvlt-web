@@ -1,7 +1,7 @@
 ---
 description: "Read-only code reviewer — checks security, style, duplicates, best practices"
 mode: subagent
-model: github-copilot/gpt-5.2-codex
+model: zai-coding-plan/glm-5.3
 permission:
   edit: deny
   bash: deny
