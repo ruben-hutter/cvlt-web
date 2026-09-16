@@ -1,4 +1,6 @@
 import Link from 'next/link'
+import { ObfuscatedEmailLink } from './ObfuscatedEmailLink'
+import { CLUB_EMAIL_ENCODED } from '@/lib/obfuscate'
 
 export function Footer() {
   return (
@@ -71,9 +73,10 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <a href="mailto:info@cvlt.ch" className="transition-colors hover:text-white">
-                  info@cvlt.ch
-                </a>
+                <ObfuscatedEmailLink
+                  encoded={CLUB_EMAIL_ENCODED}
+                  className="transition-colors hover:text-white"
+                />
               </li>
             </ul>
             <h4 className="mt-6 text-sm font-semibold uppercase tracking-wider text-gray-400">

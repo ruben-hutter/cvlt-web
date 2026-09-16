@@ -3,51 +3,53 @@
 import { useState } from 'react'
 import { fuzzySearch } from '@/lib/search'
 import { uiFieldClass } from '@/lib/ui'
+import { ObfuscatedEmailLink } from '../components/ObfuscatedEmailLink'
 
 type Pilot = {
   name: string
   phone: string
-  email?: string
+  /** base64-encoded address, see src/lib/obfuscate.ts */
+  emailEnc?: string
   website?: string
 }
 
 const pilots: Pilot[] = [
-  { name: 'Ambrosetti Marzio', phone: '+41796440138', email: 'marzio.ambrosetti@gmail.com' },
-  { name: 'Barchi Lorenz', phone: '+41792678374', email: 'info@stambekk-air.ch', website: 'stambekk-air.ch' },
-  { name: 'Bisi Fabrizio', phone: '+41793498677', email: 'bisif60@gmail.com' },
-  { name: 'Bomio Alessio', phone: '+41795050433', email: 'as.bomio@bluewin.ch' },
-  { name: 'Cattaneo Claudio', phone: '+41792390666', email: 'info@parapendio.ch', website: 'parapendio.ch' },
-  { name: 'Cavargna Eros', phone: '+41793671502', email: 'eroscavargna@gmail.com' },
-  { name: 'Cioldi Elio', phone: '+41796255918', email: 'eliocioldi@gmail.com', website: 'revolutionair.ch' },
-  { name: 'Coda Andrea', phone: '+41765611311', email: 'andrea.coda@bluewin.ch' },
-  { name: 'Coda Luca', phone: '+41793703445', email: 'luca.coda@bluewin.ch' },
+  { name: 'Ambrosetti Marzio', phone: '+41796440138', emailEnc: 'bWFyemlvLmFtYnJvc2V0dGlAZ21haWwuY29t' },
+  { name: 'Barchi Lorenz', phone: '+41792678374', emailEnc: 'aW5mb0BzdGFtYmVray1haXIuY2g=', website: 'stambekk-air.ch' },
+  { name: 'Bisi Fabrizio', phone: '+41793498677', emailEnc: 'YmlzaWY2MEBnbWFpbC5jb20=' },
+  { name: 'Bomio Alessio', phone: '+41795050433', emailEnc: 'YXMuYm9taW9AYmx1ZXdpbi5jaA==' },
+  { name: 'Cattaneo Claudio', phone: '+41792390666', emailEnc: 'aW5mb0BwYXJhcGVuZGlvLmNo', website: 'parapendio.ch' },
+  { name: 'Cavargna Eros', phone: '+41793671502', emailEnc: 'ZXJvc2NhdmFyZ25hQGdtYWlsLmNvbQ==' },
+  { name: 'Cioldi Elio', phone: '+41796255918', emailEnc: 'ZWxpb2Npb2xkaUBnbWFpbC5jb20=', website: 'revolutionair.ch' },
+  { name: 'Coda Andrea', phone: '+41765611311', emailEnc: 'YW5kcmVhLmNvZGFAYmx1ZXdpbi5jaA==' },
+  { name: 'Coda Luca', phone: '+41793703445', emailEnc: 'bHVjYS5jb2RhQGJsdWV3aW4uY2g=' },
   { name: 'Croci Manuel', phone: '+41794150066' },
-  { name: 'Domine Paolo', phone: '+41764411248', email: 'paolo.domine@bluewin.ch' },
-  { name: 'Ferrari Franco', phone: '+41793629955', email: 'franco.f@bluewin.ch' },
-  { name: 'Fontana Christian', phone: '+41793314347', email: 'fontacrigu@gmail.com' },
-  { name: 'Genazzini Stefano', phone: '+41797967618', email: 'info@flyticino.ch', website: 'flyticino.ch' },
-  { name: 'Gerber Roman', phone: '+41799484264', email: 'gerberroman@hotmail.com' },
-  { name: 'Grau Beat', phone: '+41794025852', email: 'info.grau@bluewin.ch' },
-  { name: 'Kessel Franco', phone: '+41794444414', email: 'info@pink-baron.ch', website: 'pink-baron.ch' },
-  { name: 'Kneschaurek Lorenzo', phone: '+41795428442', email: 'lorenzo.kneschaurek@bluewin.ch' },
-  { name: 'Lepori Biagio', phone: '+41794781729', email: 'biagio.lepori@gmail.com' },
-  { name: 'Loehrer Romano', phone: '+41763783537', email: 'romano@lamantino.ch', website: 'lamantino.ch' },
-  { name: 'Milani Raffaello', phone: '+41796555931', email: 'raff22@gmx.net' },
-  { name: 'Monzeglio Matteo', phone: '+41794714102', email: 'matteo.monzeglio@gmail.com' },
-  { name: 'M\u00fcller Marc', phone: '+41786866703', email: 'marc.muller95@hotmail.com' },
-  { name: 'Pellegrini Matthews', phone: '+41795192880', email: 'wehttam@hotmail.it' },
-  { name: 'Pfyl Ren\u00e9', phone: '+41794238566', email: 'info@camping-paradiso.ch', website: 'tandem-paragliding-ticino.ch' },
-  { name: 'Regusci Mauro', phone: '+41794242384', email: 'fly-4-fun@bluewin.ch' },
-  { name: 'Rigozzi Michel', phone: '+41796829381', email: 'mrigozzi@gmail.com' },
-  { name: 'Soland Michael', phone: '+41788794412', email: 'msoland@googlemail.com' },
-  { name: 'Soldati Federico', phone: '+41797967618', email: 'info@flyticino.ch', website: 'flyticino.ch' },
-  { name: 'Thio Christian', phone: '+41797615106', email: 'info@mountaingliders.com', website: 'mountaingliders.com' },
-  { name: 'Vosti Claudio', phone: '+41796217731', email: 'vosti.c@bluewin.ch' },
-  { name: 'Vosti Mattia', phone: '+41798705666', email: 'mattia.vosti@gmail.com', website: 'mattiavosti.ch' },
-  { name: 'Voumard Andrea', phone: '+41795810347', email: 'hendriu@ticino.com' },
-  { name: 'W\u00fcest Renato', phone: '+41794441455', email: 'paramania@ticino.com', website: 'paramania.ch' },
-  { name: 'Wulz Gaby', phone: '+41792539953', email: 'gabywulz@gmail.com', website: 'eagletandemfly.com' },
-  { name: 'Zoppi Marco', phone: '+41793372959', email: 'amilabylilo@bluewin.ch' },
+  { name: 'Domine Paolo', phone: '+41764411248', emailEnc: 'cGFvbG8uZG9taW5lQGJsdWV3aW4uY2g=' },
+  { name: 'Ferrari Franco', phone: '+41793629955', emailEnc: 'ZnJhbmNvLmZAYmx1ZXdpbi5jaA==' },
+  { name: 'Fontana Christian', phone: '+41793314347', emailEnc: 'Zm9udGFjcmlndUBnbWFpbC5jb20=' },
+  { name: 'Genazzini Stefano', phone: '+41797967618', emailEnc: 'aW5mb0BmbHl0aWNpbm8uY2g=', website: 'flyticino.ch' },
+  { name: 'Gerber Roman', phone: '+41799484264', emailEnc: 'Z2VyYmVycm9tYW5AaG90bWFpbC5jb20=' },
+  { name: 'Grau Beat', phone: '+41794025852', emailEnc: 'aW5mby5ncmF1QGJsdWV3aW4uY2g=' },
+  { name: 'Kessel Franco', phone: '+41794444414', emailEnc: 'aW5mb0BwaW5rLWJhcm9uLmNo', website: 'pink-baron.ch' },
+  { name: 'Kneschaurek Lorenzo', phone: '+41795428442', emailEnc: 'bG9yZW56by5rbmVzY2hhdXJla0BibHVld2luLmNo' },
+  { name: 'Lepori Biagio', phone: '+41794781729', emailEnc: 'YmlhZ2lvLmxlcG9yaUBnbWFpbC5jb20=' },
+  { name: 'Loehrer Romano', phone: '+41763783537', emailEnc: 'cm9tYW5vQGxhbWFudGluby5jaA==', website: 'lamantino.ch' },
+  { name: 'Milani Raffaello', phone: '+41796555931', emailEnc: 'cmFmZjIyQGdteC5uZXQ=' },
+  { name: 'Monzeglio Matteo', phone: '+41794714102', emailEnc: 'bWF0dGVvLm1vbnplZ2xpb0BnbWFpbC5jb20=' },
+  { name: 'M\u00fcller Marc', phone: '+41786866703', emailEnc: 'bWFyYy5tdWxsZXI5NUBob3RtYWlsLmNvbQ==' },
+  { name: 'Pellegrini Matthews', phone: '+41795192880', emailEnc: 'd2VodHRhbUBob3RtYWlsLml0' },
+  { name: 'Pfyl Ren\u00e9', phone: '+41794238566', emailEnc: 'aW5mb0BjYW1waW5nLXBhcmFkaXNvLmNo', website: 'tandem-paragliding-ticino.ch' },
+  { name: 'Regusci Mauro', phone: '+41794242384', emailEnc: 'Zmx5LTQtZnVuQGJsdWV3aW4uY2g=' },
+  { name: 'Rigozzi Michel', phone: '+41796829381', emailEnc: 'bXJpZ296emlAZ21haWwuY29t' },
+  { name: 'Soland Michael', phone: '+41788794412', emailEnc: 'bXNvbGFuZEBnb29nbGVtYWlsLmNvbQ==' },
+  { name: 'Soldati Federico', phone: '+41797967618', emailEnc: 'aW5mb0BmbHl0aWNpbm8uY2g=', website: 'flyticino.ch' },
+  { name: 'Thio Christian', phone: '+41797615106', emailEnc: 'aW5mb0Btb3VudGFpbmdsaWRlcnMuY29t', website: 'mountaingliders.com' },
+  { name: 'Vosti Claudio', phone: '+41796217731', emailEnc: 'dm9zdGkuY0BibHVld2luLmNo' },
+  { name: 'Vosti Mattia', phone: '+41798705666', emailEnc: 'bWF0dGlhLnZvc3RpQGdtYWlsLmNvbQ==', website: 'mattiavosti.ch' },
+  { name: 'Voumard Andrea', phone: '+41795810347', emailEnc: 'aGVuZHJpdUB0aWNpbm8uY29t' },
+  { name: 'W\u00fcest Renato', phone: '+41794441455', emailEnc: 'cGFyYW1hbmlhQHRpY2luby5jb20=', website: 'paramania.ch' },
+  { name: 'Wulz Gaby', phone: '+41792539953', emailEnc: 'Z2FieXd1bHpAZ21haWwuY29t', website: 'eagletandemfly.com' },
+  { name: 'Zoppi Marco', phone: '+41793372959', emailEnc: 'YW1pbGFieWxpbG9AYmx1ZXdpbi5jaA==' },
 ]
 
 function PhoneIcon() {
@@ -177,14 +179,15 @@ export function BipostoContent() {
                     >
                       <WhatsAppIcon />
                     </a>
-                    {pilot.email && (
-                      <a
-                        href={`mailto:${pilot.email}`}
+                    {pilot.emailEnc && (
+                      <ObfuscatedEmailLink
+                        encoded={pilot.emailEnc}
                         title="Email"
+                        ariaLabel={`Email ${pilot.name}`}
                         className="text-cvlt-gray-400 transition-colors hover:text-cvlt-blue"
                       >
                         <EmailIcon />
-                      </a>
+                      </ObfuscatedEmailLink>
                     )}
                     {pilot.website && (
                       <a
