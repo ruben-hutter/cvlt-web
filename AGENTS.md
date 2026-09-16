@@ -76,16 +76,17 @@ The bare repo lives at `/home/ruben/repos/cvlt_web/` with a `.bare/` directory i
 
 To create a new feature worktree (run from any existing worktree):
 ```bash
-git worktree add /home/ruben/repos/cvlt_web/feat-<name> -b feat/<name>
+git worktree add /home/ruben/repos/cvlt-web/feat-<name> -b feat/<name>
 ```
 
 ### Deploy pipeline
-1. Work on `dev` branch (current directory is `/home/ruben/repos/cvlt_web/dev`)
+1. Work on `dev` branch (current directory is `/home/ruben/repos/cvlt-web/dev`)
 2. Test locally with `npm run dev`
-3. Push to `origin dev`
-4. Create PR from dev to main (via `gh pr create`)
-5. Wait for CI to pass
-6. Merge PR → deploys to `cvlt.ch`
+3. Run the AI review: `bash scripts/ai-review.sh` (GitHub Copilot gpt-4.1 via the `gh` CLI; exit 2 = FAIL and blocks the deploy)
+4. Push to `origin dev`
+5. Create PR from dev to main (via `gh pr create`)
+6. Wait for CI to pass
+7. Merge PR → deploys to `cvlt.ch`
 
 ### How to merge into main from the dev worktree
 ```bash

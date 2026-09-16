@@ -13,10 +13,17 @@ Run lint and typecheck to ensure nothing is broken:
 If there are errors, STOP and report them — do not proceed.
 
 ## 2. AI code review
-Invoke the `@reviewer` subagent on the staged diff. Pass it all changed files so it can review for security issues, code quality, duplicate code, and best practices.
+Run the harness-independent review script on the changes to be deployed:
 
-- If the reviewer returns **FAIL**: STOP and report the issues to the user. Do not proceed until the user confirms the issues are acceptable or have been fixed.
-- If the reviewer returns **PASS**: proceed to the next step.
+- `bash scripts/ai-review.sh`
+
+It reviews `origin/main...HEAD` automatically (or a diff piped to it), using
+the GitHub Copilot API via the `gh` CLI. Exit codes: 0 = PASS, 2 = FAIL,
+1 = error.
+
+- If it exits **2 (FAIL)**: STOP and report the issues to the user. Do not proceed until the user confirms the issues are acceptable or have been fixed.
+- If it exits **1**: report the error (auth/network) and stop.
+- If it exits **0 (PASS)**: proceed to the next step.
 
 ## 3. Commit
 - Run `git status` and `git diff` to see all changes

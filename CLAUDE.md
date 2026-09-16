@@ -75,10 +75,11 @@ This project uses **git worktrees**. The branches live in separate directories:
 ### Deploy pipeline
 1. Work on `dev` branch (current directory is the dev worktree)
 2. Test locally with `npm run dev`
-3. Push to `origin dev`
-4. Create PR from dev to main (via `gh pr create`)
-5. Wait for CI to pass
-6. Merge PR → deploys to `cvlt.ch`
+3. Run the AI review: `bash scripts/ai-review.sh` (GitHub Copilot gpt-4.1 via the `gh` CLI; exit 2 = FAIL and blocks the deploy)
+4. Push to `origin dev`
+5. Create PR from dev to main (via `gh pr create`)
+6. Wait for CI to pass
+7. Merge PR → deploys to `cvlt.ch`
 
 ### How to merge into main from the dev worktree
 ```bash
