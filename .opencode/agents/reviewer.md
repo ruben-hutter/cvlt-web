@@ -1,7 +1,7 @@
 ---
 description: "Read-only code reviewer — checks security, style, duplicates, best practices"
 mode: subagent
-model: zai-coding-plan/glm-5.3
+model: openai/gpt-5.5
 permission:
   edit: deny
   bash: deny
