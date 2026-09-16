@@ -116,11 +116,20 @@ if (dryRun) {
 }
 
 let updated = 0
+const fileUrl = (name) => (name ? `/api/media/file/${name}` : null)
 for (const f of fixes) {
   try {
     await db.execute({
-      sql: 'UPDATE media SET filename = ?, sizes_thumbnail_filename = ?, sizes_medium_filename = ? WHERE id = ?',
-      args: [f.newMain, f.newThumb || null, f.newMedium || null, f.id],
+      sql: `UPDATE media SET filename = ?, url = ?, sizes_thumbnail_filename = ?, sizes_thumbnail_url = ?, sizes_medium_filename = ?, sizes_medium_url = ? WHERE id = ?`,
+      args: [
+        f.newMain,
+        fileUrl(f.newMain),
+        f.newThumb || null,
+        fileUrl(f.newThumb),
+        f.newMedium || null,
+        fileUrl(f.newMedium),
+        f.id,
+      ],
     })
     updated++
     if (updated % 100 === 0) console.log(`[REPAIR] Updated ${updated}/${fixes.length}...`)

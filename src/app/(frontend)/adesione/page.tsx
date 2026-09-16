@@ -1,4 +1,6 @@
 import { MembershipForm } from './MembershipForm'
+import { ObfuscatedEmailLink } from '../components/ObfuscatedEmailLink'
+import { CLUB_EMAIL_ENCODED } from '@/lib/obfuscate'
 
 export const metadata = {
   title: 'Aderire al club',
@@ -22,7 +24,11 @@ export default function MembershipPage() {
           Per ulteriori informazioni leggi lo{' '}
           <a href="/statuto" className="font-medium text-cvlt-blue hover:text-cvlt-blue-dark hover:underline">statuto del club</a>{' '}
           o scrivici a{' '}
-          <a href="mailto:info@cvlt.ch" className="font-medium text-cvlt-blue hover:text-cvlt-blue-dark hover:underline">info@cvlt.ch</a>.
+          <ObfuscatedEmailLink
+            encoded={CLUB_EMAIL_ENCODED}
+            className="font-medium text-cvlt-blue hover:text-cvlt-blue-dark hover:underline"
+          />
+          .
         </p>
       </div>
 

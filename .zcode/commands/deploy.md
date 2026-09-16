@@ -1,14 +1,13 @@
 ---
 description: "Validate, commit, merge to main, deploy to production"
-agent: build
 ---
 
 You are deploying the current changes to production (cvlt.ch). Follow these steps exactly:
 
 ## 1. Pre-flight checks
-Run lint and typecheck to ensure nothing is broken:
-- `npx next lint`
+Run typecheck and tests to ensure nothing is broken:
 - `npx tsc --noEmit`
+- `npm test`
 
 If there are errors, STOP and report them — do not proceed.
 
