@@ -195,7 +195,8 @@ if (errors > 0) {
 
 console.log('[MIGRATE] Updating database...')
 
-const sql = 'UPDATE media SET filename = ?, sizes_thumbnail_filename = ?, sizes_medium_filename = ? WHERE id = ?'
+const fileUrl = (name) => (name ? `/api/media/file/${name}` : null)
+const sql = `UPDATE media SET filename = ?, url = ?, sizes_thumbnail_filename = ?, sizes_thumbnail_url = ?, sizes_medium_filename = ?, sizes_medium_url = ? WHERE id = ?`
 let dbUpdated = 0
 
 for (const { id, newFilename, sizeUpdates } of dbUpdates) {
@@ -204,8 +205,11 @@ for (const { id, newFilename, sizeUpdates } of dbUpdates) {
       sql,
       args: [
         newFilename,
+        fileUrl(newFilename),
         sizeUpdates.thumb || null,
+        fileUrl(sizeUpdates.thumb),
         sizeUpdates.medium || null,
+        fileUrl(sizeUpdates.medium),
         id,
       ],
     })

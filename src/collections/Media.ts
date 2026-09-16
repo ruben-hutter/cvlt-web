@@ -1,7 +1,9 @@
 import type { CollectionConfig } from 'payload'
+import { stat } from 'fs/promises'
+import path from 'path'
 import { isAdmin, isLoggedIn } from './Users'
 
-function sanitizeFilename(name: string): string {
+export function sanitizeFilename(name: string): string {
   const ext = name.match(/\.[^.]+$/)?.[0] || ''
   const base = name.replace(/\.[^.]+$/, '')
   const sanitized = base
@@ -12,6 +14,80 @@ function sanitizeFilename(name: string): string {
     .replace(/^-|-$/g, '')
     .toLowerCase()
   return sanitized + ext.toLowerCase()
+}
+
+/**
+ * Given a filename that is missing from disk, return its sanitized variant
+ * if that exists, else null. Covers URLs indexed before the September 2026
+ * filename migration (underscores, mixed case).
+ */
+export function resolveStaleMediaRedirect(
+  filename: string,
+  diskHas: (name: string) => boolean,
+): string | null {
+  for (const candidate of staleMediaRedirectCandidates(filename)) {
+    if (diskHas(candidate)) return candidate
+  }
+  return null
+}
+
+function staleMediaRedirectCandidates(filename: string): string[] {
+  if (!filename) return []
+  const sanitized = sanitizeFilename(filename)
+  return sanitized !== filename ? [sanitized] : []
+}
+
+type MediaUploadConfig = Extract<NonNullable<CollectionConfig['upload']>, object>
+type MediaUploadHandler = NonNullable<MediaUploadConfig['handlers']>[number]
+
+/**
+ * Runs before Payload's local-disk fallback on every /api/media/file request.
+ * Without it, a missing file falls through to a 500 + "missing on the disk"
+ * error log for every stale URL still circulating in search indexes.
+ */
+export function staleMediaHandler(
+  getMediaDir: () => string = () => path.resolve(process.cwd(), 'media'),
+): MediaUploadHandler {
+  const handler = async (
+    _req: unknown,
+    args: { params: { filename?: string } },
+  ): Promise<Response | void> => {
+    const filename = args.params?.filename
+    if (!filename || filename.includes('/') || filename.includes('\\')) return
+
+    const mediaDir = getMediaDir()
+    const requested = path.resolve(mediaDir, filename)
+    if (!requested.startsWith(mediaDir + path.sep)) return
+    const diskHas = async (name: string) => {
+      try {
+        await stat(path.join(mediaDir, name))
+        return true
+      } catch {
+        return false
+      }
+    }
+
+    if (await diskHas(filename)) return
+
+    let target: string | null = null
+    for (const candidate of staleMediaRedirectCandidates(filename)) {
+      if (await diskHas(candidate)) {
+        target = candidate
+        break
+      }
+    }
+    if (!target) {
+      return Response.json({ errors: [{ message: 'File not found.' }] }, { status: 404 })
+    }
+    return new Response(null, {
+      status: 301,
+      headers: {
+        Location: `/api/media/file/${encodeURIComponent(target)}`,
+        'Cache-Control': 'public, max-age=31536000, immutable',
+      },
+    })
+  }
+  return handler as MediaUploadHandler
 }
 
 export const Media: CollectionConfig = {
@@ -29,6 +105,7 @@ export const Media: CollectionConfig = {
       { name: 'medium', width: 1024, formatOptions: { format: 'webp' } },
     ],
     adminThumbnail: 'thumbnail',
+    handlers: [staleMediaHandler()],
   },
   access: {
     read: () => true,
