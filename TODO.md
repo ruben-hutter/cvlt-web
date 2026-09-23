@@ -2,6 +2,8 @@
 
 ## High priority
 
+- [x] **Allow non-PDF documents as uploads/news attachments** (docx, xlsx, pptx, odt, ods, odp, zip, txt, csv): shared `DOCUMENT_MIME_TYPES` constant used by both the Media collection and the News attachment block. Legacy Office formats (.doc/.xls/.ppt) are not supported because Payload's content sniffing detects them as `application/x-cfb` (same as .msi).
+- [x] **Make uploaded files (PDF/documents) findable in the Payload admin**: unhide the base `mimeType` field (list column "Tipo file" + filter dropdown), add `listSearchableFields: ['alt', 'filename', 'mimeType']` so the media search box finds files by name/type, and show `mimeType` in the default columns.
 - [ ] Think about changing the race leaderboard in a way that you can look up also in the future the results of the past years (similar to hall of fame)
     - Maybe add also a place where to download the pdf of the results
 - [ ] In comitato page make person's containers "flip" on click and behing them show more info (maybe motivation or contact info)

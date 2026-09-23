@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload'
 import { stat } from 'fs/promises'
 import path from 'path'
 import { isAdmin, isLoggedIn } from './Users'
+import { DOCUMENT_MIME_TYPES } from '../lib/constants'
 
 export function sanitizeFilename(name: string): string {
   const ext = name.match(/\.[^.]+$/)?.[0] || ''
@@ -96,10 +97,20 @@ export const Media: CollectionConfig = {
   lockDocuments: false,
   admin: {
     useAsTitle: 'alt',
-    defaultColumns: ['filename', 'alt', 'updatedAt'],
+    defaultColumns: ['filename', 'alt', 'mimeType', 'updatedAt'],
+    listSearchableFields: ['alt', 'filename', 'mimeType'],
+    description:
+      'Immagini, video e documenti (PDF, Word, Excel, ZIP, ...). Usa la ricerca per trovare i file per nome, descrizione o tipo (es. «pdf», «docx»).',
   },
   upload: {
-    mimeTypes: ['image/*', 'video/mp4', 'video/x-m4v', 'video/webm', 'video/quicktime', 'application/pdf'],
+    mimeTypes: [
+      'image/*',
+      'video/mp4',
+      'video/x-m4v',
+      'video/webm',
+      'video/quicktime',
+      ...DOCUMENT_MIME_TYPES,
+    ],
     imageSizes: [
       { name: 'thumbnail', width: 400, formatOptions: { format: 'webp' } },
       { name: 'medium', width: 1024, formatOptions: { format: 'webp' } },
@@ -137,6 +148,15 @@ export const Media: CollectionConfig = {
     ],
   },
   fields: [
+    {
+      // Payload adds `mimeType` as an admin-hidden base upload field; unhiding
+      // it makes it usable as a list column and in the admin filter dropdown,
+      // so non-image files can actually be found and filtered in the admin.
+      name: 'mimeType',
+      type: 'text',
+      label: 'Tipo file',
+      admin: { hidden: false },
+    },
     {
       name: 'alt',
       type: 'text',
