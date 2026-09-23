@@ -1,6 +1,7 @@
 import type { Block, CollectionConfig, FieldHook } from 'payload'
 import { isLoggedIn } from './Users'
 import { titleToSlug, deduplicateSlug } from '../lib/slug'
+import { DOCUMENT_MIME_TYPES } from '../lib/constants'
 
 const formatSlug: FieldHook = async ({ data, originalDoc, operation, req }) => {
   if (!data?.title) return undefined
@@ -153,7 +154,7 @@ const AttachmentBlock: Block = {
       label: 'File',
       relationTo: 'media',
       required: true,
-      filterOptions: { mimeType: { equals: 'application/pdf' } },
+      filterOptions: { mimeType: { in: [...DOCUMENT_MIME_TYPES] } },
     },
     {
       name: 'label',
