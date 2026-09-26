@@ -435,7 +435,7 @@ describe('confirm', () => {
   })
 
   it('returns 400 for an unknown action', async () => {
-    const res = await postShopOrder({ action: 'status', orderRef: 'abc' })
+    const res = await postShopOrder({ action: 'bogus' })
     expect(res.status).toBe(400)
     expect((await res.json()).error).toBe('Azione non valida.')
   })
@@ -476,7 +476,7 @@ describe('incident 2026-09-26 regression (lost shop order)', () => {
   // Written against the webhook contract in
   // plans/tickets/2026-09-26-A-shop-server-side-order-confirmation.md.
   // TODO(Ticket A): unskip when feat/shop-server-side-confirm lands.
-  describe.skip('POST /api/shop-webhook', () => {
+  describe("POST /api/shop-webhook", () => {
     it('creates the order when RaiseNow reports payment success even if the browser never returns', async () => {
       const prepareRes = await postShopOrder(prepareBody())
       const { orderRef } = (await prepareRes.json()) as { orderRef: string }
@@ -487,7 +487,7 @@ describe('incident 2026-09-26 regression (lost shop order)', () => {
       const webhookRes = await webhookPOST(
         new Request('http://localhost:3000/api/shop-webhook', {
           method: 'POST',
-          headers: { 'content-type': 'application/json', 'x-forwarded-for': nextIp() },
+          headers: { 'content-type': 'application/json', 'x-forwarded-for': nextIp(), 'x-webhook-secret': process.env.SHOP_WEBHOOK_SECRET ?? '' },
           body: JSON.stringify({
             event: 'payment.succeeded',
             transaction: { id: 'rn-txn-1', status: 'success' },

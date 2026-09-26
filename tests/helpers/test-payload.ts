@@ -36,6 +36,11 @@ export function getTestConfig(collections: CollectionConfig[] = DEFAULT_COLLECTI
   return configSingleton
 }
 
+/**
+ * Boot a minimal Payload instance for tests. The collections list is
+ * parameterized (e.g. add ShopOrders when testing order persistence); note
+ * that the singleton memoizes the FIRST collections list it is called with.
+ */
 export async function getTestPayload(
   collections: CollectionConfig[] = DEFAULT_COLLECTIONS,
 ): Promise<Payload> {
