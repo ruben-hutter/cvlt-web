@@ -2,6 +2,13 @@
 
 ## High priority
 
+- [ ] **HOTFIX 2026-09-26: lost shop order incident** — a customer paid (Twint, CHF 55) but the order was never saved/emailed because confirmation is client-side only. Tickets in `plans/tickets/` (runnable in parallel):
+    - [ ] A: server-side/webhook order confirmation (`plans/tickets/2026-09-26-A-shop-server-side-order-confirmation.md`) — supersedes the older `/shop/confirm` item below
+    - [ ] B: fix `console.info` logging gap + structured shop logging (`plans/tickets/2026-09-26-B-fix-console-info-logging-gap.md`)
+    - [ ] C: shop watchdog monitoring/alerting (`plans/tickets/2026-09-26-C-shop-watchdog-and-monitoring.md`)
+    - [ ] D: shop order integration tests (`plans/tickets/2026-09-26-D-shop-order-integration-tests.md`)
+    - Manual (Ruben): recover buyer data from RaiseNow backoffice (~15:28 CEST, CHF 55) and register the order — see `plans/tickets/2026-09-26-incident-report-lost-shop-order.md`
+
 - [x] **Allow non-PDF documents as uploads/news attachments** (docx, xlsx, pptx, odt, ods, odp, zip, txt, csv): shared `DOCUMENT_MIME_TYPES` constant used by both the Media collection and the News attachment block. Legacy Office formats (.doc/.xls/.ppt) are not supported because Payload's content sniffing detects them as `application/x-cfb` (same as .msi).
 - [x] **Make uploaded files (PDF/documents) findable in the Payload admin**: unhide the base `mimeType` field (list column "Tipo file" + filter dropdown), add `listSearchableFields: ['alt', 'filename', 'mimeType']` so the media search box finds files by name/type, and show `mimeType` in the default columns.
 - [ ] Think about changing the race leaderboard in a way that you can look up also in the future the results of the past years (similar to hall of fame)
@@ -16,7 +23,7 @@
     - Breaking down large functions into smaller ones
     - Overall improving readability and maintainability of the code base
 - [ ] Make the two charts on the vento page just one! First part is mesured data and second part is forecast. Think of a way to visually make the difference clear but still have it as one chart.
-- [ ] Shop payment confirmation: replace the `?shop_paid=1` + `localStorage` flow with a dedicated `/shop/confirm` page that receives the `orderRef` from RaiseNow's redirect URL. This makes confirmation robust even if `localStorage` is cleared, the user uses a different browser, or the redirect URL doesn't include the expected query params. Include the `orderRef` in the RaiseNow redirect URL so the order can be recovered server-side.
+- [ ] Shop payment confirmation: replace the `?shop_paid=1` + `localStorage` flow with a dedicated `/shop/confirm` page that receives the `orderRef` from RaiseNow's redirect URL. This makes confirmation robust even if `localStorage` is cleared, the user uses a different browser, or the redirect URL doesn't include the expected query params. Include the `orderRef` in the RaiseNow redirect URL so the order can be recovered server-side. **(superseded by ticket A above — keep until A ships)**
 - [x] **Media filename migration script**: write a one-time script to rename existing files on disk + update DB records so all media filenames are SEO-friendly (lowercase, hyphens, no spaces/parens). Most files were imported via seed script with original dirty names (e.g. `traversata (1)-3.jpg`, `photo_106@01-05-2026_20-53-46.jpg`). The `beforeOperation` hook now sanitizes new uploads, but existing media still has dirty filenames.
 
 ## Medium priority
