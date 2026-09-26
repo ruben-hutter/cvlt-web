@@ -113,10 +113,13 @@ async function sweepExpiredReservationsInTxn(
 
   for (const doc of result.docs) {
     const d = doc as unknown as Record<string, unknown>
+    // Mark as 'expired' (not 'released'): the watchdog alerts on expired rows
+    // that were never consumed (no alertedAt). This way an order lost between
+    // two watchdog runs is still caught — see plans/tickets/...-C-shop-watchdog.
     await payload.update({
       collection: 'shop-reservations',
       id: d.id as number | string,
-      data: { status: 'released' },
+      data: { status: 'expired' },
       overrideAccess: true,
       req: txnReq(txn),
     })

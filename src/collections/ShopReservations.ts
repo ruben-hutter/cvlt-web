@@ -1,7 +1,9 @@
 import type { CollectionConfig } from 'payload'
 import { isAdmin } from './Users'
 
-export type ReservationStatus = 'active' | 'fulfilled' | 'released'
+// 'released' is kept only for historical rows; the sweep now writes 'expired'
+// so the watchdog can spot holds that lapsed without a confirmed order.
+export type ReservationStatus = 'active' | 'fulfilled' | 'expired' | 'released'
 
 export type ReservationItem = {
   key: string
@@ -17,7 +19,7 @@ export const ShopReservations: CollectionConfig = {
     group: 'Shop',
     defaultColumns: ['orderRef', 'status', 'expiresAt', 'createdAt'],
     description:
-      'Prenotazioni di magazzino per checkout TWINT non ancora confermati. Gestite automaticamente dal sistema: scadono dopo 2 ore e rilasciano la quantità. Sola lettura.',
+      'Prenotazioni di magazzino per checkout TWINT non ancora confermati. Gestite automaticamente dal sistema: scadono dopo 2 ore e passano a "Scaduta". Il watchdog invia una mail di avviso (una sola) se la prenotazione scade senza ordine confermato (campo "Avviso inviato il"). Sola lettura.',
   },
   access: {
     read: isAdmin,
@@ -42,6 +44,7 @@ export const ShopReservations: CollectionConfig = {
       options: [
         { label: 'Attiva', value: 'active' },
         { label: 'Confermata', value: 'fulfilled' },
+        { label: 'Scaduta', value: 'expired' },
         { label: 'Rilasciata', value: 'released' },
       ],
     },
@@ -57,6 +60,16 @@ export const ShopReservations: CollectionConfig = {
       label: 'Scadenza',
       required: true,
       admin: { date: { pickerAppearance: 'dayAndTime' } },
+    },
+    {
+      name: 'alertedAt',
+      type: 'date',
+      label: 'Avviso inviato il',
+      admin: {
+        readOnly: true,
+        description:
+          'Impostato dal watchdog quando la mail "possibile ordine perso" è stata inviata per questa prenotazione. Garantisce un solo avviso per prenotazione.',
+      },
     },
   ],
 }
