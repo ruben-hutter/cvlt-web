@@ -102,3 +102,17 @@ Do NOT `git checkout main` in the dev worktree. Use PR-based merges via `gh`.
 
 ## Screenshot Feedback
 When the user shares a screenshot during a session, automatically check it against the latest changes to provide visual feedback. Screenshots are saved to `~/Pictures/Screenshots/`.
+
+## Agent skills
+
+### Issue tracker
+
+GitHub Issues in `ruben-hutter/cvlt-web` via the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default five-role vocabulary (label string = role name). See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: `GLOSSARY.md` + `docs/adr/` at the repo root. See `docs/agents/domain.md`.

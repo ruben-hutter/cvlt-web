@@ -23,6 +23,14 @@ const transporter = nodemailer.createTransport({
   },
 })
 
+/**
+ * Verifies the SMTP configuration (connect + auth) without sending any mail.
+ * Used by the watchdog daily self-check.
+ */
+export async function verifyMailTransport(): Promise<void> {
+  await transporter.verify()
+}
+
 const from = requireEnv('SMTP_FROM')
 const contactRecipient = requireEnv('CONTACT_EMAIL')
 const membershipRecipient = requireEnv('MEMBERSHIP_EMAIL')
@@ -421,5 +429,107 @@ ${paymentInstructionsHtml}
 <p style="margin-top:20px;">Cordiali saluti,<br>Club Volo Libero Ticino<br><a href="https://cvlt.ch">cvlt.ch</a></p>
 `,
     attachments: invoiceAttachments,
+  })
+}
+
+function formatStockKey(stockKey: string) {
+  const parts = stockKey.split('__')
+  const productName = parts[0] ?? ''
+  const variant = parts[1] ?? ''
+  const size = parts[2] ?? ''
+  return `${productName} (${variant}, taglia ${size})`
+}
+
+export type ShopWatchdogAlertData = {
+  orderRef: string
+  items: Array<{ key: string; qty: number }>
+  createdAt?: string
+}
+
+/**
+ * Alert sent to SHOP_EMAIL when a shop reservation expired without ever being
+ * consumed (no confirmed order) — a paid order was probably lost.
+ * The watchdog guarantees exactly one email per reservation (alertedAt field).
+ */
+export async function sendShopWatchdogAlert(data: ShopWatchdogAlertData) {
+  const itemsText = data.items
+    .map((item) => `- ${formatStockKey(item.key)} × ${item.qty}`)
+    .join('\n')
+  const itemsHtml = data.items
+    .map(
+      (item) =>
+        `<li>${e(formatStockKey(item.key))} × ${item.qty}</li>`,
+    )
+    .join('')
+
+  await transporter.sendMail({
+    from,
+    to: shopRecipient,
+    subject: `[WATCHDOG] Possibile ordine shop perso (${data.orderRef})`,
+    text: `Avviso automatico dal watchdog dello shop cvlt.ch
+
+Una prenotazione di magazzino è scaduta senza che l'ordine fosse mai stato
+confermato a livello server. Se il cliente aveva già pagato (TWINT), l'ordine
+è probabilmente andato perso.
+
+Riferimento ordine: ${data.orderRef}
+Data creazione prenotazione: ${data.createdAt ?? 'sconosciuta'}
+
+Articoli prenotati:
+${itemsText}
+
+Cosa fare:
+1. Controlla sul backoffice RaiseNow se è arrivato un pagamento corrispondente
+   (https://admin.raisenow.com).
+2. Se il pagamento c'è, registra l'ordine manualmente in Payload
+   (/admin → collezione "Ordini shop"), riutilizzando questo orderRef:
+   ${data.orderRef}
+3. Contatta il cliente con la conferma dell'ordine.
+`,
+    html: `
+<h2>Possibile ordine shop perso</h2>
+<p>Avviso automatico dal watchdog dello shop cvlt.ch: una prenotazione di magazzino è scaduta senza che l'ordine fosse mai stato confermato a livello server. <strong>Se il cliente aveva già pagato (TWINT), l'ordine è probabilmente andato perso.</strong></p>
+<table style="border-collapse:collapse;">
+  <tr><td style="padding:4px 12px 4px 0;font-weight:bold;">Riferimento ordine</td><td style="font-family:ui-monospace, monospace;">${e(data.orderRef)}</td></tr>
+  <tr><td style="padding:4px 12px 4px 0;font-weight:bold;">Data creazione prenotazione</td><td>${e(data.createdAt ?? 'sconosciuta')}</td></tr>
+</table>
+<h3>Articoli prenotati</h3>
+<ul>${itemsHtml}</ul>
+<h3>Cosa fare</h3>
+<ol>
+  <li>Controlla sul <a href="https://admin.raisenow.com">backoffice RaiseNow</a> se è arrivato un pagamento corrispondente.</li>
+  <li>Se il pagamento c'è, registra l'ordine manualmente in Payload (<em>/admin → Ordini shop</em>), riutilizzando questo orderRef: <code>${e(data.orderRef)}</code></li>
+  <li>Contatta il cliente con la conferma dell'ordine.</li>
+</ol>
+`,
+  })
+}
+
+/**
+ * Digest of the failed watchdog self-checks (SMTP / DB / paylink).
+ * Sent at most once per day (gated by the watchdog via payload.kv).
+ */
+export async function sendWatchdogSelfCheckAlert(failures: string[], ranAt: string) {
+  const listText = failures.map((failure) => `- ${failure}`).join('\n')
+  const listHtml = failures.map((failure) => `<li>${e(failure)}</li>`).join('')
+
+  await transporter.sendMail({
+    from,
+    to: shopRecipient,
+    subject: '[WATCHDOG] Controlli automatici falliti su cvlt.ch',
+    text: `Avviso automatico dal watchdog dello shop cvlt.ch
+
+Alcuni controlli automatici della pipeline sono falliti il ${ranAt}:
+
+${listText}
+
+Controlla i log del server per i dettagli (righe con prefisso [watchdog]).
+`,
+    html: `
+<h2>Controlli automatici falliti</h2>
+<p>Il watchdog dello shop cvlt.ch ha rilevato problemi il <strong>${e(ranAt)}</strong>:</p>
+<ul>${listHtml}</ul>
+<p>Controlla i log del server per i dettagli (righe con prefisso <code>[watchdog]</code>).</p>
+`,
   })
 }

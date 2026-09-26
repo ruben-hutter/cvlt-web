@@ -52,15 +52,18 @@ export async function POST(request: Request) {
       overrideAccess: true,
     })
 
+    console.info('[contact] submission received')
+
     try {
       await sendContactNotification({ firstName, lastName, email, message })
+      console.info('[contact] email sent')
     } catch (emailError) {
-      console.error('Failed to send contact email:', emailError)
+      console.error('[contact] email failed:', emailError)
     }
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Contact form error:', error)
+    console.error('[contact] unhandled error:', error)
     return NextResponse.json({ error: 'Si è verificato un errore. Riprova più tardi.' }, { status: 500 })
   }
 }

@@ -109,7 +109,7 @@ describe('consumeReservation (TWINT confirm after payment)', () => {
 })
 
 describe('sweepExpiredReservations', () => {
-  it('filters expired reservations from availability and sweeps them to released', async () => {
+  it('filters expired reservations from availability and sweeps them to expired', async () => {
     await resetState(payload, { [KEY]: 2 })
     await reserveItems(payload, [{ key: KEY, qty: 2 }], 'ord-expired', 300)
 

@@ -1,18 +1,18 @@
 ---
-description: "Validate, commit, merge to main, deploy to production"
+description: "Validate, commit, merge to main, deploy to production (cvlt.ch)"
 ---
 
 You are deploying the current changes to production (cvlt.ch). Follow these steps exactly:
 
 ## 1. Pre-flight checks
-Run typecheck and tests to ensure nothing is broken:
+Run lint and typecheck to ensure nothing is broken:
+- `npx next lint`
 - `npx tsc --noEmit`
-- `npm test`
 
 If there are errors, STOP and report them — do not proceed.
 
 ## 2. AI code review
-Run the harness-independent review script on the changes to be deployed:
+If `scripts/ai-review.sh` exists in this worktree, run the harness-independent review script on the changes to be deployed:
 
 - `bash scripts/ai-review.sh`
 
@@ -23,6 +23,11 @@ the GitHub Copilot API via the `gh` CLI. Exit codes: 0 = PASS, 2 = FAIL,
 - If it exits **2 (FAIL)**: STOP and report the issues to the user. Do not proceed until the user confirms the issues are acceptable or have been fixed.
 - If it exits **1**: report the error (auth/network) and stop.
 - If it exits **0 (PASS)**: proceed to the next step.
+
+Otherwise, review the changes to be deployed using the `code-review` skill (uncommitted changes plus commits not yet on the remote). Focus on security issues, code quality, duplicate code, and best practices.
+
+- If the review finds **critical** issues (FAIL): STOP and report them to the user. Do not proceed until the user confirms the issues are acceptable or have been fixed.
+- Otherwise (PASS): proceed to the next step.
 
 ## 3. Commit
 - Run `git status` and `git diff` to see all changes
