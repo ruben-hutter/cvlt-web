@@ -34,6 +34,11 @@ echo "=== CVLT timed deploy started at $(date) ===" | tee "${log_file}"
 
 {
   run_step "git pull" git pull origin main
+  # Apply pending DB migrations BEFORE building/restarting. The `echo y`
+  # answers Payload's one-time prompt about the historic drizzle-push batch
+  # ("dev") still recorded in payload_migrations; the actual pending
+  # migrations are explicit committed files and safe to apply.
+  run_step "db migrate" sh -c 'echo y | npm run db:migrate'
   run_step "npm run build:timed" npm run build:timed
 
   echo ""
