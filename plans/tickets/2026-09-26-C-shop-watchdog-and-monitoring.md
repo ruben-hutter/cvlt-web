@@ -54,3 +54,70 @@ of any kind today.
 
 - Uses reservation `status` values — align with Ticket A's final state list.
 - Uses `src/lib/mail.ts` — if B changes logging there, rebase trivially.
+
+---
+
+## Implementation notes (feat/shop-watchdog, 2026-09-26)
+
+### How it works
+
+- **Check module**: `src/lib/watchdog.ts`
+  - `runStuckReservationCheck()` finds `shop_reservations` rows that expired without
+    being consumed and sends one alert mail per reservation to `SHOP_EMAIL`
+    (orderRef, item keys, created_at, RaiseNow backoffice instructions).
+  - `runSelfChecks()` runs the daily pipeline checks; each check is independent and
+    failures are collected into a single digest alert:
+    - **SMTP**: `transport.verify()` via `verifyMailTransport()` in `src/lib/mail.ts`
+      (connect + authenticate, sends no mail).
+    - **DB**: write + read-back of a nonce row in the internal `payload_kv` store
+      (`payload.kv`, key `watchdog:selfcheck:dbProbe`).
+    - **Paylink**: `fetch(SHOP_PAYLINK_URL)`, any status < 500 counts as alive.
+- **Alerted state — design decision**: tracked via a new **`alertedAt` date field on
+  the reservation itself** (not `payload_kv`), written only *after* the mail was sent
+  successfully. Mail failure → not marked → retried on the next run; success → never
+  duplicated. An in-process mutex serializes overlapping runs (cron + manual).
+- **New reservation status `expired`** (labels: Attiva / Confermata / Scaduta /
+  Rilasciata). `sweepExpiredReservations()` in `src/lib/shop-stock.ts` now writes
+  `expired` instead of `released` — otherwise a checkout minutes after a hold lapses
+  would flip the row to a “silent” state before the watchdog ever saw it, and the
+  lost-order alert would be lost. `released` remains valid for historical rows.
+- **Scheduling**: Infomaniak shared hosting has no shell cron, so the watchdog is a
+  protected endpoint. **The production URL must be registered as an Infomaniak panel
+  cron (every 15–30 min, plain HTTP GET):**
+
+  ```
+  GET https://cvlt.ch/api/cron/watchdog?key=<CRON_SECRET>
+  ```
+
+  `CRON_SECRET` is a new env var (see `.env.example`; generate with
+  `openssl rand -base64 32`). The key is compared constant-time (both sides hashed
+  before `timingSafeEqual`); missing/wrong key → `401`; **no secret configured →
+  every request rejected (fail closed)**. A `503` body signals a run with failures.
+- **Manual test mode**: `GET /api/cron/watchdog?key=<CRON_SECRET>&force=1` runs all
+  self-checks immediately (ignores the 24 h gate) in addition to the reservation
+  sweep. Safe to call from a browser or curl.
+- **Daily gate**: self-checks run at most once per 24 h (last-run timestamp in
+  `payload_kv`, key `watchdog:selfcheck:lastRunAt`). A persistent failure therefore
+  alerts ~once/day instead of once per cron tick. Reservation alerts are NOT gated —
+  exactly-once per reservation via `alertedAt`.
+- The watchdog never throws out of the endpoint: every stage is wrapped, failures are
+  logged with the `[watchdog]` prefix and reported in the JSON response.
+
+### Testing
+
+- `tests/watchdog.test.ts`: expired reservation → status flip + exactly-once alert
+  (mail mocked at module boundary), race with the stock sweep, concurrent runs,
+  SMTP-failure retry, self-check gating + digest, and 401s for missing/wrong key.
+- Local manual test: `curl 'http://localhost:3000/api/cron/watchdog?key=...&force=1'`.
+  Mail mocks mean `npm test` never sends real email.
+
+### Acceptance criteria status
+
+- [x] Unconsumed expired reservation → exactly one alert (unit-tested).
+- [x] Broken SMTP config → digest alert within one check cycle (unit-tested via
+      mocked transport failure).
+- [x] Endpoint without the secret returns 401 (unit-tested on the shared handler).
+- [x] Watchdog failures never crash the app (all stages wrapped; route catches
+      Payload init errors).
+- [x] `npx tsc --noEmit` + `npm test` pass. (`npm run lint`: this repo currently has
+      no ESLint config — `npx next lint` is not runnable, skipped per repo convention.)
