@@ -137,6 +137,12 @@ function formatStockKey(stockKey: string) {
   return `${productName} (${variant}, taglia ${size})`
 }
 
+// One-line, PII-free item summary for structured log lines (product/variant/size
+// are catalog data, not personal data).
+function summarizeItems(items: CartItem[]) {
+  return items.map((item) => `${item.productName}/${item.variant}/${item.size} x${item.quantity}`).join(', ')
+}
+
 function hasMaxTwoDecimals(value: number) {
   return Math.abs(value * 100 - Math.round(value * 100)) < 1e-8
 }
@@ -187,14 +193,11 @@ function buildCheckoutUrl(payload: OrderPayload) {
 
   url.searchParams.set('reference.campaign_subid', payload.orderRef)
 
-  console.info('[shop-order] checkout prepared', {
-    orderRef: payload.orderRef,
-    total: payload.total,
-    paylinkHost: url.host,
-    paylinkPath: url.pathname,
-    nodeEnv: process.env.NODE_ENV ?? 'undefined',
-    serverUrlHost: serverUrl.host,
-  })
+  // Single-line string (not an object arg) so the server.log tee keeps it greppable.
+  console.info(
+    `[shop-order] prepare ok ref=${payload.orderRef} payment=twint total=${payload.total} ` +
+      `items=${summarizeItems(payload.items)} paylinkHost=${url.host}${url.pathname} serverUrlHost=${serverUrl.host}`,
+  )
 
   return url.toString()
 }
@@ -228,8 +231,10 @@ async function handlePrepare(body: PrepareRequest) {
   const antispam = validateAntispamFields({ honeypot: website, renderTs })
   if (!antispam.ok) {
     if (antispam.reason === 'honeypot') {
+      console.warn('[shop-order] prepare rejected reason=antispam-honeypot')
       return NextResponse.json({ success: true, orderRef: crypto.randomUUID(), paymentMethod: 'invoice', paymentStatus: 'pending_invoice' })
     }
+    console.warn(`[shop-order] prepare rejected reason=antispam-${antispam.reason}`)
     return NextResponse.json({ error: 'Verifica anti-spam non superata. Ricarica la pagina e riprova.' }, { status: 400 })
   }
 
@@ -244,6 +249,7 @@ async function handlePrepare(body: PrepareRequest) {
     !Array.isArray(items) ||
     items.length === 0
   ) {
+    console.warn('[shop-order] prepare rejected reason=validation-missing-fields')
     return NextResponse.json({ error: 'Dati ordine incompleti.' }, { status: 400 })
   }
 
@@ -253,6 +259,7 @@ async function handlePrepare(body: PrepareRequest) {
     typeof address !== 'string' || typeof postalCode !== 'string' ||
     typeof city !== 'string'
   ) {
+    console.warn('[shop-order] prepare rejected reason=validation-bad-types')
     return NextResponse.json({ error: 'Dati non validi.' }, { status: 400 })
   }
 
@@ -262,18 +269,22 @@ async function handlePrepare(body: PrepareRequest) {
     !isWithinLimit(postalCode, 'postalCode') || !isWithinLimit(city, 'city') ||
     !isWithinLimit(notes, 'notes') || items.length > 50
   ) {
+    console.warn('[shop-order] prepare rejected reason=validation-too-long')
     return NextResponse.json({ error: 'Dati ordine troppo lunghi.' }, { status: 400 })
   }
 
   if (!isValidEmailFormat(email) || isBlockedEmailDomain(email)) {
+    console.warn('[shop-order] prepare rejected reason=validation-email')
     return NextResponse.json({ error: 'Indirizzo email non valido.' }, { status: 400 })
   }
 
   if (!items.every(isValidCartItem)) {
+    console.warn('[shop-order] prepare rejected reason=validation-cart')
     return NextResponse.json({ error: 'Carrello non valido.' }, { status: 400 })
   }
 
   if (paymentMethod !== 'twint' && paymentMethod !== 'invoice') {
+    console.warn('[shop-order] prepare rejected reason=validation-payment-method')
     return NextResponse.json({ error: 'Metodo di pagamento non valido.' }, { status: 400 })
   }
 
@@ -284,6 +295,7 @@ async function handlePrepare(body: PrepareRequest) {
     const key = catalogKey(item.productName, item.variant, item.size)
     const entry = lookup.get(key)
     if (!entry) {
+      console.warn(`[shop-order] prepare rejected reason=validation-unknown-item itemKey=${key}`)
       return NextResponse.json({ error: 'Articolo non valido o non più disponibile.' }, { status: 400 })
     }
     validatedItems.push({
@@ -299,6 +311,7 @@ async function handlePrepare(body: PrepareRequest) {
 
   const total = normalizeCartTotal(validatedItems)
   if (!Number.isFinite(total) || total <= 0 || !hasMaxTwoDecimals(total)) {
+    console.warn('[shop-order] prepare rejected reason=validation-total')
     return NextResponse.json({ error: 'Totale ordine non valido.' }, { status: 400 })
   }
 
@@ -323,6 +336,7 @@ async function handlePrepare(body: PrepareRequest) {
 
   if (paymentMethod === 'invoice') {
     if (await isOrderConfirmed(order.orderRef)) {
+      console.info(`[shop-order] prepare ok (already confirmed) ref=${order.orderRef}`)
       return NextResponse.json({
         success: true,
         alreadyConfirmed: true,
@@ -336,6 +350,7 @@ async function handlePrepare(body: PrepareRequest) {
       await decrementStockForSale(payload, reservationItems)
     } catch (error) {
       if (error instanceof InsufficientStockError) {
+        console.warn(`[shop-order] prepare rejected reason=out-of-stock stockKey=${error.stockKey}`)
         return NextResponse.json(
           { error: `Articolo esaurito: ${formatStockKey(error.stockKey)}. Riprova più tardi.` },
           { status: 409 },
@@ -346,10 +361,16 @@ async function handlePrepare(body: PrepareRequest) {
 
     await saveOrderToDb(order)
 
+    console.info(
+      `[shop-order] prepare ok ref=${order.orderRef} payment=invoice status=${order.paymentStatus} ` +
+        `total=${order.total} items=${summarizeItems(order.items)}`,
+    )
+
     try {
       await sendShopOrderNotification(order)
+      console.info(`[shop-order] email sent ref=${order.orderRef}`)
     } catch (emailError) {
-      console.error('Failed to send shop order email:', emailError)
+      console.error(`[shop-order] email failed ref=${order.orderRef}`, emailError)
     }
 
     return NextResponse.json({
@@ -364,6 +385,7 @@ async function handlePrepare(body: PrepareRequest) {
     await reserveItems(payload, reservationItems, order.orderRef, SHOP_RESERVATION_TTL_MS)
   } catch (error) {
     if (error instanceof InsufficientStockError) {
+      console.warn(`[shop-order] prepare rejected reason=out-of-stock stockKey=${error.stockKey}`)
       return NextResponse.json(
         { error: `Articolo esaurito: ${formatStockKey(error.stockKey)}. Riprova più tardi.` },
         { status: 409 },
@@ -381,6 +403,7 @@ async function handlePrepare(body: PrepareRequest) {
 async function handleConfirm(body: ConfirmRequest) {
   const { orderToken } = body
   if (!orderToken) {
+    console.warn('[shop-order] confirm rejected reason=validation-missing-token')
     return NextResponse.json({ error: 'Token ordine mancante.' }, { status: 400 })
   }
 
@@ -389,10 +412,12 @@ async function handleConfirm(body: ConfirmRequest) {
   const isExpired = Number.isNaN(createdAtMs) || Date.now() - createdAtMs > SHOP_RESERVATION_TTL_MS
 
   if (isExpired) {
+    console.warn(`[shop-order] confirm rejected reason=token-expired ref=${order.orderRef}`)
     return NextResponse.json({ error: 'Ordine scaduto, riprovare dal carrello.' }, { status: 400 })
   }
 
   if (await isOrderConfirmed(order.orderRef)) {
+    console.info(`[shop-order] confirm ok (already confirmed) ref=${order.orderRef}`)
     return NextResponse.json({
       success: true,
       alreadyConfirmed: true,
@@ -405,6 +430,7 @@ async function handleConfirm(body: ConfirmRequest) {
   const payload = await getPayload({ config })
   const consumed = await consumeReservation(payload, order.orderRef)
   if (!consumed) {
+    console.warn(`[shop-order] confirm rejected reason=reservation-gone ref=${order.orderRef}`)
     return NextResponse.json(
       { error: 'La prenotazione è scaduta o non più valida. Riprova dal carrello.' },
       { status: 409 },
@@ -413,10 +439,16 @@ async function handleConfirm(body: ConfirmRequest) {
 
   await saveOrderToDb(order)
 
+  console.info(
+    `[shop-order] confirm ok ref=${order.orderRef} payment=${order.paymentMethod} ` +
+      `status=${order.paymentStatus} total=${order.total}`,
+  )
+
   try {
     await sendShopOrderNotification(order)
+    console.info(`[shop-order] email sent ref=${order.orderRef}`)
   } catch (emailError) {
-    console.error('Failed to send shop order email:', emailError)
+    console.error(`[shop-order] email failed ref=${order.orderRef}`, emailError)
   }
 
   return NextResponse.json({
@@ -431,6 +463,7 @@ export async function POST(request: Request) {
   const ip = extractClientIp(request)
   const { allowed } = rateLimit({ key: `shop-order:${ip}`, limit: 3, windowMs: 60_000 })
   if (!allowed) {
+    console.warn(`[shop-order] rejected reason=rate-limit ip=${ip}`)
     return NextResponse.json({ error: 'Troppe richieste. Riprova più tardi.' }, { status: 429 })
   }
 
@@ -445,9 +478,10 @@ export async function POST(request: Request) {
       return handleConfirm(body as ConfirmRequest)
     }
 
+    console.warn('[shop-order] rejected reason=invalid-action')
     return NextResponse.json({ error: 'Azione non valida.' }, { status: 400 })
   } catch (error) {
-    console.error('Shop order error:', error)
+    console.error('[shop-order] unhandled error:', error)
     return NextResponse.json({ error: 'Si è verificato un errore. Riprova più tardi.' }, { status: 500 })
   }
 }

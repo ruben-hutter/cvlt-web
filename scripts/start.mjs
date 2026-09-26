@@ -70,7 +70,9 @@ if (startupSize > 10 * LOG_MAX_BYTES) {
 
 const stamp = () => new Date().toISOString().slice(0, 19).replace('T', ' ')
 
-for (const method of ['log', 'error', 'warn']) {
+// 'info' must stay in this list: the shop-order route logs checkout preparations
+// via console.info — without it the production log has zero trace of them.
+for (const method of ['log', 'info', 'error', 'warn']) {
   const original = console[method]
   console[method] = (...args) => {
     original(...args)
