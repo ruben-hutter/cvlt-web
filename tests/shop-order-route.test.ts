@@ -519,7 +519,7 @@ describe('mail failure resilience', () => {
       expect(data.success).toBe(true)
 
       expect((await findOrders(data.orderRef)).totalDocs).toBe(1)
-      expect(errorSpy).toHaveBeenCalledWith('Failed to send shop order email:', expect.any(Error))
+      expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('[shop-order] email failed'), expect.any(Error))
     } finally {
       errorSpy.mockRestore()
     }
@@ -538,7 +538,7 @@ describe('mail failure resilience', () => {
 
       expect((await findOrders(orderRef)).totalDocs).toBe(1)
       expect(((await findReservations(orderRef)).docs[0] as { status?: string }).status).toBe('fulfilled')
-      expect(errorSpy).toHaveBeenCalledWith('Failed to send shop order email:', expect.any(Error))
+      expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('[shop-order] email failed'), expect.any(Error))
     } finally {
       errorSpy.mockRestore()
     }
