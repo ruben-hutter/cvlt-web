@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "prebuild": "mkdir -p db media .backups logs && rm -rf .next/standalone/db .next/standalone/media 2>/dev/null && [ -f db/payload.db ] && cp db/payload.db \".backups/payload.db.$(date +%Y_%m_%d_%H%M%S)\" || true && ls -1t .backups/payload.db.* 2>/dev/null | tail -n +31 | xargs rm -f -- 2>/dev/null || true",
-    "build": "payload generate:importmap && next build && cp -r .next/static .next/standalone/.next/static && cp -r public .next/standalone/public && ln -sf ../../db .next/standalone/db && ln -sf ../../media .next/standalone/media",
+    "build": "payload generate:importmap && payload generate:types && next build && cp -r .next/static .next/standalone/.next/static && cp -r public .next/standalone/public && ln -sf ../../db .next/standalone/db && ln -sf ../../media .next/standalone/media",
     "build:timed": "bash scripts/build-timed.sh",
     "db:migrate": "payload migrate",
     "db:migrate:status": "payload migrate:status",
