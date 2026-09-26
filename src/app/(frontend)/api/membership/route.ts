@@ -77,15 +77,18 @@ export async function POST(request: Request) {
       overrideAccess: true,
     })
 
+    console.info('[membership] submission received')
+
     try {
       await sendMembershipNotification({ firstName, lastName, address, city, email, phone, membershipType, notes })
+      console.info('[membership] email sent')
     } catch (emailError) {
-      console.error('Failed to send membership email:', emailError)
+      console.error('[membership] email failed:', emailError)
     }
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Membership submission error:', error)
+    console.error('[membership] unhandled error:', error)
     return NextResponse.json({ error: 'Si è verificato un errore. Riprova più tardi.' }, { status: 500 })
   }
 }
