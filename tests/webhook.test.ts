@@ -264,8 +264,8 @@ describe('shop webhook (POST /api/shop-webhook)', () => {
     expect(res.status).toBe(200)
 
     expect(await countOrders(payload, orderRef)).toBe(1)
-    // Reservation was swept to released, stock still decremented exactly once.
-    expect((await findReservation(payload, orderRef))?.status).toBe('released')
+    // Reservation was swept to expired, stock still decremented exactly once.
+    expect((await findReservation(payload, orderRef))?.status).toBe('expired')
     expect(await getStockValue(payload, KEY)).toBe(1)
     expect(sendMock).toHaveBeenCalledTimes(1)
   })

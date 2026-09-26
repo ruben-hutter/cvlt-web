@@ -145,7 +145,7 @@ async function clearOrders() {
 }
 
 beforeAll(async () => {
-  payload = await getTestPayload(routeCollections)
+  payload = await getTestPayload({ collections: routeCollections })
   await seedStock(payload)
 })
 
@@ -416,9 +416,9 @@ describe('confirm', () => {
     expect(res.status).toBe(409)
     expect((await res.json()).error).toBe('La prenotazione è scaduta o non più valida. Riprova dal carrello.')
 
-    // the sweep marked the stale reservation as released
+    // the sweep marked the stale reservation as expired (watchdog needs to see it)
     const after = await findReservations(orderRef)
-    expect((after.docs[0] as { status?: string }).status).toBe('released')
+    expect((after.docs[0] as { status?: string }).status).toBe('expired')
     expect(await countAllOrders()).toBe(0)
   })
 
