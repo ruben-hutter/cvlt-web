@@ -11,8 +11,8 @@ import {
   SHOP_RESERVATION_TTL_MS,
   type CartItem,
   type PaymentMethod,
-  type PaymentStatus,
 } from '@/lib/shop'
+import { isOrderConfirmed, saveOrderToDb, type OrderPayload } from '@/lib/shop-orders'
 import { buildCatalogLookup, catalogKey } from '@/lib/shop-catalog'
 import {
   consumeReservation,
@@ -43,21 +43,9 @@ type ConfirmRequest = {
   orderToken: string
 }
 
-type OrderPayload = {
-  orderRef: string
-  firstName: string
-  lastName: string
-  email: string
-  phone: string
-  address: string
-  postalCode: string
-  city: string
-  notes?: string
-  paymentMethod: PaymentMethod
-  paymentStatus: PaymentStatus
-  total: number
-  createdAt: string
-  items: CartItem[]
+type StatusRequest = {
+  action: 'status'
+  orderRef?: string
 }
 
 const allowedPaylinkHosts = new Set(['pay.raisenow.io'])
@@ -101,16 +89,6 @@ function verifyOrderToken(token: string) {
     paymentMethod: payload.paymentMethod === 'invoice' ? 'invoice' : 'twint',
     paymentStatus: payload.paymentStatus === 'pending_invoice' ? 'pending_invoice' : 'paid',
   } as OrderPayload
-}
-
-async function isOrderConfirmed(orderRef: string): Promise<boolean> {
-  const payload = await getPayload({ config })
-  const existing = await payload.find({
-    collection: 'shop-orders',
-    where: { orderRef: { equals: orderRef } },
-    limit: 1,
-  })
-  return existing.totalDocs > 0
 }
 
 function isValidCartItem(item: CartItem) {
@@ -199,27 +177,34 @@ function buildCheckoutUrl(payload: OrderPayload) {
   return url.toString()
 }
 
-async function saveOrderToDb(order: OrderPayload) {
+// Read-only order status for the /shop/confirm result page.
+// Returns a state only (paid / pending / not_found) — never any customer PII:
+// the orderRef is an unguessable UUID that only the buyer received.
+const ORDER_REF_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
+
+async function handleStatus(body: StatusRequest) {
+  const orderRef = typeof body.orderRef === 'string' ? body.orderRef.trim().toLowerCase() : ''
+  if (!ORDER_REF_PATTERN.test(orderRef)) {
+    return NextResponse.json({ error: 'Riferimento ordine non valido.' }, { status: 400 })
+  }
+
+  if (await isOrderConfirmed(orderRef)) {
+    return NextResponse.json({ success: true, status: 'paid' })
+  }
+
   const payload = await getPayload({ config })
-  await payload.create({
-    collection: 'shop-orders',
-    data: {
-      orderRef: order.orderRef,
-      firstName: order.firstName,
-      lastName: order.lastName,
-      email: order.email,
-      phone: order.phone,
-      address: order.address,
-      postalCode: order.postalCode,
-      city: order.city,
-      notes: order.notes || '',
-      paymentMethod: order.paymentMethod,
-      paymentStatus: order.paymentStatus,
-      total: order.total,
-      items: order.items,
-    },
+  const reservations = await payload.find({
+    collection: 'shop-reservations',
+    where: { orderRef: { equals: orderRef } },
+    limit: 1,
+    depth: 0,
     overrideAccess: true,
   })
+  const reservation = reservations.docs[0] as unknown as { status?: string } | undefined
+
+  const status =
+    reservation?.status === 'fulfilled' ? 'paid' : reservation ? 'pending' : 'not_found'
+  return NextResponse.json({ success: true, status })
 }
 
 async function handlePrepare(body: PrepareRequest) {
@@ -429,13 +414,23 @@ async function handleConfirm(body: ConfirmRequest) {
 
 export async function POST(request: Request) {
   const ip = extractClientIp(request)
-  const { allowed } = rateLimit({ key: `shop-order:${ip}`, limit: 3, windowMs: 60_000 })
-  if (!allowed) {
-    return NextResponse.json({ error: 'Troppe richieste. Riprova più tardi.' }, { status: 429 })
-  }
 
   try {
     const body = (await request.json()) as Record<string, unknown>
+
+    if (body.action === 'status') {
+      // Polling endpoint: needs a much higher limit than prepare/confirm.
+      const { allowed } = rateLimit({ key: `shop-order-status:${ip}`, limit: 30, windowMs: 60_000 })
+      if (!allowed) {
+        return NextResponse.json({ error: 'Troppe richieste. Riprova più tardi.' }, { status: 429 })
+      }
+      return handleStatus(body as StatusRequest)
+    }
+
+    const { allowed } = rateLimit({ key: `shop-order:${ip}`, limit: 3, windowMs: 60_000 })
+    if (!allowed) {
+      return NextResponse.json({ error: 'Troppe richieste. Riprova più tardi.' }, { status: 429 })
+    }
 
     if (body.action === 'prepare') {
       return handlePrepare(body as PrepareRequest)
