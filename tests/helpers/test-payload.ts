@@ -1,5 +1,5 @@
 import { mkdirSync, rmSync } from 'fs'
-import { buildConfig, getPayload, type Payload } from 'payload'
+import { buildConfig, getPayload, type CollectionConfig, type Payload } from 'payload'
 import { sqliteAdapter } from '@payloadcms/db-sqlite'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { ShopStock } from '../../src/collections/ShopStock'
@@ -9,25 +9,42 @@ import { shopProducts, catalogKey } from '../../src/lib/shop-catalog'
 const TEST_DB_URL = 'file:./.tmp/test-payload.db'
 const TEST_DB_FILE = './.tmp/test-payload.db'
 
+const DEFAULT_COLLECTIONS: CollectionConfig[] = [ShopStock, ShopReservations]
+
+type TestPayloadConfig = ReturnType<typeof buildConfig>
+
+let configSingleton: TestPayloadConfig | null = null
 let payloadSingleton: Promise<Payload> | null = null
 
-function createTestConfig() {
-  return buildConfig({
-    secret: 'cvlt-test-secret-not-for-prod',
-    graphQL: { disable: true },
-    db: sqliteAdapter({ client: { url: TEST_DB_URL } }),
-    editor: lexicalEditor({ features: [] }),
-    collections: [ShopStock, ShopReservations],
-  })
+/**
+ * Build (once per test file) a Payload config registering the given collections.
+ * The first call in a test file wins: subsequent calls with different collections
+ * return the cached config, so every call site in one test file must pass the
+ * same list. Route-level tests share this config with the `@payload-config` mock
+ * so that `getPayload` boots exactly one instance against the shared SQLite file.
+ */
+export function getTestConfig(collections: CollectionConfig[] = DEFAULT_COLLECTIONS): TestPayloadConfig {
+  if (!configSingleton) {
+    configSingleton = buildConfig({
+      secret: 'cvlt-test-secret-not-for-prod',
+      graphQL: { disable: true },
+      db: sqliteAdapter({ client: { url: TEST_DB_URL } }),
+      editor: lexicalEditor({ features: [] }),
+      collections,
+    })
+  }
+  return configSingleton
 }
 
-export async function getTestPayload(): Promise<Payload> {
+export async function getTestPayload(
+  collections: CollectionConfig[] = DEFAULT_COLLECTIONS,
+): Promise<Payload> {
   if (!payloadSingleton) {
     mkdirSync('./.tmp', { recursive: true })
     for (const suffix of ['', '-wal', '-shm', '-journal']) {
       rmSync(TEST_DB_FILE + suffix, { force: true })
     }
-    payloadSingleton = getPayload({ config: createTestConfig() })
+    payloadSingleton = getPayload({ config: getTestConfig(collections) })
   }
   return payloadSingleton
 }
