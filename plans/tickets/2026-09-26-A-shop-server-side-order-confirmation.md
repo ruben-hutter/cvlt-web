@@ -69,6 +69,24 @@ The server — not the customer's browser — must be the authority that finaliz
 - [ ] Tests from Ticket D (or your own) cover webhook confirm, double-confirm
       idempotency, unknown orderRef, expired reservation + successful payment.
 
+## Status update 2026-09-27: RaiseNow basic plan has NO webhooks
+
+The club's RaiseNow package ("Pagamenti più" payment page "Shop CVLT", pay.raisenow.io/stpxb)
+offers no webhook configuration in the dashboard. Consequences:
+
+- The deployed `/api/shop-webhook` stays **dormant** (answers 503 fail-closed) until
+  either the plan changes or RaiseNow support enables webhooks/API — worth one support email.
+- `SHOP_WEBHOOK_SECRET` does NOT need to be set for now.
+- Order confirmation remains the **browser flow**: RaiseNow redirect → `/shop?shop_paid=1`
+  → localStorage token → `confirm` POST. Do NOT repoint the RaiseNow success redirect to
+  `/shop/confirm` — that page only polls the read-only status endpoint, it cannot finalize orders.
+- The **watchdog (Ticket C) is the active safety net**: expired-unconsumed reservations
+  (= probable lost order) trigger one alert email each to `SHOP_EMAIL`; Ruben then completes
+  the order manually using the RaiseNow transaction data.
+- RaiseNow's own "transaction confirmation copy" email (Settings → Notifiche → shop@cvlt.ch)
+  is the independent payment signal — it was NOT arriving as of 2026-09-26; troubleshoot
+  (spam, Infomaniak mail logs, test payment, RaiseNow support).
+
 ## Coordination with other tickets
 
 - **D (tests)** may already add route tests against the *current* API; keep the
