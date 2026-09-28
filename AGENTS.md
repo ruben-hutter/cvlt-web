@@ -86,7 +86,32 @@ git worktree add /home/ruben/repos/cvlt/cvlt-web/feat-<name> -b feat/<name>
 4. Push to `origin dev`
 5. Create PR from dev to main (via `gh pr create`)
 6. Wait for CI to pass
-7. Merge PR → deploys to `cvlt.ch`
+7. Merge PR → then click **Deploy** in the Infomaniak panel (merging alone does not deploy)
+
+### Production deploy (Infomaniak panel)
+
+Settings configured in the panel (not in the repo): Node.js 24, build command
+`npm run deploy:timed`, run command `npm start`, port 3000. The app lives at
+`/srv/customer/sites/cvlt.ch` on the host; the panel restarts it automatically
+after the build command exits. SSH access exists (credentials via Infomaniak
+panel — never in this public repo).
+
+What `scripts/deploy-timed.sh` does on each panel deploy: `git pull origin
+main` → DB migrations → timed build. Two things worth knowing:
+
+- **Self-healing script**: the panel launches the checkout's copy of the script
+  as it exists when deploy is clicked. If the pull updates the script itself,
+  it re-execs the fresh version (since d447926), so script changes ship
+  atomically with the deploy that introduces them.
+- **Migrations are automatic** — `payload migrate` runs on every deploy (the
+  `echo y` answers Payload's one-time prompt about the historic drizzle-push
+  batch; committed migrations are safe to apply). Never run migrations
+  manually after a deploy.
+
+The only manual deploy step: **new env vars in `.env` on the server** (via
+panel file manager or SSH). PRs that add a required env var must call this out
+in the PR description. Verify a deploy by tailing `logs/deploy-timing.*.log`
+and `logs/server.log` on the host.
 
 ### How to merge into main from the dev worktree
 ```bash
