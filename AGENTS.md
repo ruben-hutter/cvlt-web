@@ -66,21 +66,21 @@ Modern, clean, fast. Tailwind utility classes.
 
 This project uses **git worktrees**. The branches live in separate directories:
 
-The bare repo lives at `/home/ruben/repos/cvlt_web/` with a `.bare/` directory inside it. All worktrees are subdirectories of this bare repo:
+The bare repo lives at `/home/ruben/repos/cvlt/cvlt-web/` with a `.bare/` directory inside it. All worktrees are subdirectories of this bare repo:
 
 | Branch | Directory | Purpose |
 |:---|:---|:---|
-| `main` | `/home/ruben/repos/cvlt_web/main` | Production (cvlt.ch) |
-| `dev` | `/home/ruben/repos/cvlt_web/dev` | Development (local) |
-| `feat/*` | `/home/ruben/repos/cvlt_web/feat-*` | Feature branches |
+| `main` | `/home/ruben/repos/cvlt/cvlt-web/main` | Production (cvlt.ch) |
+| `dev` | `/home/ruben/repos/cvlt/cvlt-web/dev` | Development (local) |
+| `feat/*` | `/home/ruben/repos/cvlt/cvlt-web/feat-*` | Feature branches |
 
 To create a new feature worktree (run from any existing worktree):
 ```bash
-git worktree add /home/ruben/repos/cvlt-web/feat-<name> -b feat/<name>
+git worktree add /home/ruben/repos/cvlt/cvlt-web/feat-<name> -b feat/<name>
 ```
 
 ### Deploy pipeline
-1. Work on `dev` branch (current directory is `/home/ruben/repos/cvlt-web/dev`)
+1. Work on `dev` branch (current directory is `/home/ruben/repos/cvlt/cvlt-web/dev`)
 2. Test locally with `npm run dev`
 3. Run the AI review: `bash scripts/ai-review.sh` (GitHub Copilot gpt-4.1 via the `gh` CLI; exit 2 = FAIL and blocks the deploy)
 4. Push to `origin dev`
