@@ -43,6 +43,7 @@ const pilots: Pilot[] = [
   { name: 'Rigozzi Michel', phone: '+41796829381', emailEnc: 'bXJpZ296emlAZ21haWwuY29t' },
   { name: 'Soland Michael', phone: '+41788794412', emailEnc: 'bXNvbGFuZEBnb29nbGVtYWlsLmNvbQ==' },
   { name: 'Soldati Federico', phone: '+41797967618', emailEnc: 'aW5mb0BmbHl0aWNpbm8uY2g=', website: 'flyticino.ch' },
+  { name: 'Tessaro Daniele', phone: '+41783155209', emailEnc: 'aW5mb0B2b2xldHRvLmNo', website: 'voletto.ch' },
   { name: 'Thio Christian', phone: '+41797615106', emailEnc: 'aW5mb0Btb3VudGFpbmdsaWRlcnMuY29t', website: 'mountaingliders.com' },
   { name: 'Vosti Claudio', phone: '+41796217731', emailEnc: 'dm9zdGkuY0BibHVld2luLmNo' },
   { name: 'Vosti Mattia', phone: '+41798705666', emailEnc: 'bWF0dGlhLnZvc3RpQGdtYWlsLmNvbQ==', website: 'mattiavosti.ch' },
