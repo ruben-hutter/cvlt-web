@@ -66,27 +66,52 @@ Modern, clean, fast. Tailwind utility classes.
 
 This project uses **git worktrees**. The branches live in separate directories:
 
-The bare repo lives at `/home/ruben/repos/cvlt_web/` with a `.bare/` directory inside it. All worktrees are subdirectories of this bare repo:
+The bare repo lives at `/home/ruben/repos/cvlt/cvlt-web/` with a `.bare/` directory inside it. All worktrees are subdirectories of this bare repo:
 
 | Branch | Directory | Purpose |
 |:---|:---|:---|
-| `main` | `/home/ruben/repos/cvlt_web/main` | Production (cvlt.ch) |
-| `dev` | `/home/ruben/repos/cvlt_web/dev` | Development (local) |
-| `feat/*` | `/home/ruben/repos/cvlt_web/feat-*` | Feature branches |
+| `main` | `/home/ruben/repos/cvlt/cvlt-web/main` | Production (cvlt.ch) |
+| `dev` | `/home/ruben/repos/cvlt/cvlt-web/dev` | Development (local) |
+| `feat/*` | `/home/ruben/repos/cvlt/cvlt-web/feat-*` | Feature branches |
 
 To create a new feature worktree (run from any existing worktree):
 ```bash
-git worktree add /home/ruben/repos/cvlt-web/feat-<name> -b feat/<name>
+git worktree add /home/ruben/repos/cvlt/cvlt-web/feat-<name> -b feat/<name>
 ```
 
 ### Deploy pipeline
-1. Work on `dev` branch (current directory is `/home/ruben/repos/cvlt-web/dev`)
+1. Work on `dev` branch (current directory is `/home/ruben/repos/cvlt/cvlt-web/dev`)
 2. Test locally with `npm run dev`
 3. Run the AI review: `bash scripts/ai-review.sh` (GitHub Copilot gpt-4.1 via the `gh` CLI; exit 2 = FAIL and blocks the deploy)
 4. Push to `origin dev`
 5. Create PR from dev to main (via `gh pr create`)
 6. Wait for CI to pass
-7. Merge PR → deploys to `cvlt.ch`
+7. Merge PR → then click **Deploy** in the Infomaniak panel (merging alone does not deploy)
+
+### Production deploy (Infomaniak panel)
+
+Settings configured in the panel (not in the repo): Node.js 24, build command
+`npm run deploy:timed`, run command `npm start`, port 3000. The app lives at
+`/srv/customer/sites/cvlt.ch` on the host; the panel restarts it automatically
+after the build command exits. SSH access exists (credentials via Infomaniak
+panel — never in this public repo).
+
+What `scripts/deploy-timed.sh` does on each panel deploy: `git pull origin
+main` → DB migrations → timed build. Two things worth knowing:
+
+- **Self-healing script**: the panel launches the checkout's copy of the script
+  as it exists when deploy is clicked. If the pull updates the script itself,
+  it re-execs the fresh version (since d447926), so script changes ship
+  atomically with the deploy that introduces them.
+- **Migrations are automatic** — `payload migrate` runs on every deploy (the
+  `echo y` answers Payload's one-time prompt about the historic drizzle-push
+  batch; committed migrations are safe to apply). Never run migrations
+  manually after a deploy.
+
+The only manual deploy step: **new env vars in `.env` on the server** (via
+panel file manager or SSH). PRs that add a required env var must call this out
+in the PR description. Verify a deploy by tailing `logs/deploy-timing.*.log`
+and `logs/server.log` on the host.
 
 ### How to merge into main from the dev worktree
 ```bash
