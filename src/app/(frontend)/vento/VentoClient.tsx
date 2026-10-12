@@ -28,8 +28,8 @@ function windLevelColor(level: WindStation['windLevel']) {
 
 function windLevelBorder(level: WindStation['windLevel']) {
   switch (level) {
-    case 'strong': return 'border-red-300 bg-red-50/50'
-    case 'moderate': return 'border-amber-200 bg-amber-50/30'
+    case 'strong': return 'border-red-300 bg-red-100'
+    case 'moderate': return 'border-amber-200 bg-amber-100'
     default: return 'border-cvlt-gray-200'
   }
 }
@@ -849,11 +849,11 @@ function WindLegend() {
       <div className="border-t border-cvlt-gray-200 pt-2 mt-2 space-y-2">
         <p className="font-medium text-cvlt-gray-500">Colore bordo e testo:</p>
         <div className="flex items-start gap-2">
-          <span className="mt-0.5 inline-block h-2.5 w-2.5 flex-shrink-0 rounded-full border border-red-300 bg-red-50" />
+          <span className="mt-0.5 inline-block h-2.5 w-2.5 flex-shrink-0 rounded-full border border-red-300 bg-red-100" />
           <span>Rosso &ndash; vento forte oppure da nord con &gt;8 km/h</span>
         </div>
         <div className="flex items-start gap-2">
-          <span className="mt-0.5 inline-block h-2.5 w-2.5 flex-shrink-0 rounded-full border border-amber-200 bg-amber-50" />
+          <span className="mt-0.5 inline-block h-2.5 w-2.5 flex-shrink-0 rounded-full border border-amber-200 bg-amber-100" />
           <span>Arancione &ndash; vento moderato oppure da nord con raffiche</span>
         </div>
         <div className="flex items-start gap-2">
