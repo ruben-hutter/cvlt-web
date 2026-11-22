@@ -59,8 +59,9 @@ Italian only. Multilingual possible in the future (see TODO.md).
 Modern, clean, fast. Tailwind utility classes.
 
 ## Working Conventions
-- Follow `TODO.md` for current priorities and `plans/` for planned features
-- The `plans/` directory contains research/plan documents for upcoming work
+- Work items are GitHub issues: `gh issue list` (migrated from the former TODO.md). Label vocabulary: `docs/agents/triage-labels.md`, tracker conventions: `docs/agents/issue-tracker.md`
+- `ready-for-agent` issues are fully specified — an agent can pick them up directly; `needs-triage` issues need scoping first
+- The `plans/` directory contains research/plan documents and detailed ticket specs referenced by issues
 
 ## Git & Worktree Setup
 
