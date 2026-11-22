@@ -1,20 +1,8 @@
 # CVLT Web
 
-Website of the **Club Volo Libero Ticino** (cvlt.ch)
+[Website](https://cvlt.ch) of the **Club Volo Libero Ticino**
 
 Built with [Next.js](https://nextjs.org/) and [Payload CMS](https://payloadcms.com/).
-
-## Tech stack
-
-| Layer     | Tech                                              |
-| :-------- | :------------------------------------------------ |
-| Framework | Next.js (App Router)                              |
-| CMS       | Payload 3.0 (embedded)                            |
-| Database  | SQLite via `@payloadcms/db-sqlite`                |
-| Styling   | Tailwind CSS                                      |
-| Runtime   | Node.js 24 LTS                                    |
-| Email     | Nodemailer via Infomaniak SMTP                    |
-| Hosting   | Infomaniak shared hosting                         |
 
 ## Prerequisites
 

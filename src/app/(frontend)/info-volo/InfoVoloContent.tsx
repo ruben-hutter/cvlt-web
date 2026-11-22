@@ -354,6 +354,42 @@ export function InfoVoloContent() {
           </ExternalLink>
         </p>
 
+        {/* Mappa ufficiale dello spazio aereo (SHV/FSVL) */}
+        <div className="mt-6">
+          {/*
+            L'iframe è ritagliato per nascondere la barra di intestazione del sito
+            SHV/FSVL (logo/login/menu): l'iframe è più alto del contenitore e spostato
+            in su dell'esatta altezza dell'header loro (+1px per nascondere anche il
+            bordo superiore della loro toolbar, altrimenti doppia linea col bordo del
+            contenitore). Le media query dell'iframe rispondono alla LARGHEZZA
+            DELL'IFRAME (max ~992px, contenitore max-w-5xl), non a quella della
+            finestra: header 106px se iframe <550px (⇔ viewport <582px, contando
+            px-4 di padding), altrimenti 60px. Il regime ≥1150px (header 100px) non
+            si verifica mai dentro il contenitore. Altezze da arsp.css di
+            airspace.shv-fsvl.ch — aggiornarle se cambia il loro layout.
+          */}
+          <div className="relative h-[60vh] overflow-hidden rounded-lg border border-cvlt-gray-200 bg-cvlt-gray-100 md:h-[70vh]">
+            <iframe
+              src="https://airspace.shv-fsvl.ch/map"
+              title="Mappa dello spazio aereo SHV/FSVL"
+              loading="lazy"
+              className="absolute left-0 top-[-107px] h-[calc(60vh+107px)] w-full border-0 min-[582px]:top-[-61px] min-[582px]:h-[calc(60vh+61px)] md:h-[calc(70vh+61px)]"
+              referrerPolicy="strict-origin-when-cross-origin"
+              allowFullScreen
+            />
+          </div>
+          <p className="mt-2 text-sm text-cvlt-gray-500">
+            Mappa dello spazio aereo &mdash; fonte ufficiale SHV/FSVL.{' '}
+            <ExternalLink href="https://airspace.shv-fsvl.ch/map">
+              Apri a schermo intero
+            </ExternalLink>
+          </p>
+          <p className="mt-1 text-xs text-cvlt-gray-500">
+            La mappa mostra la geometria generale dello spazio aereo, non le attivazioni
+            correnti: verifica sempre il DABS attuale su skybriefing.com.
+          </p>
+        </div>
+
         <div className="mt-6 rounded-lg border border-cvlt-gray-200">
           <Section title="Zone di controllo (CTR)" defaultOpen>
             <p>
