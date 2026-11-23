@@ -285,7 +285,7 @@ function HallOfFame() {
 
   return (
     <div>
-      <div className="mb-4 flex items-center gap-3">
+      <div className="mb-4 flex items-center justify-between gap-3">
         <select
           value={selectedYear}
           onChange={(e) => setSelectedYear(Number(e.target.value))}
