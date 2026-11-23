@@ -286,17 +286,19 @@ function HallOfFame() {
   return (
     <div>
       <div className="mb-4 flex items-center justify-between gap-3">
-        <select
-          value={selectedYear}
-          onChange={(e) => setSelectedYear(Number(e.target.value))}
-          className={`${uiSelectClass} w-auto border-cvlt-gray-200 py-1.5 font-medium shadow-sm`}
-        >
+        <div className="w-32">
+          <select
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(Number(e.target.value))}
+            className={`${uiSelectClass} font-medium shadow-sm`}
+          >
           {cccHallOfFame.map((e) => (
             <option key={e.year} value={e.year}>
               {e.year}
             </option>
           ))}
-        </select>
+          </select>
+        </div>
         {entry.link && (
           <ExternalLink href={entry.link}>Classifica completa</ExternalLink>
         )}
