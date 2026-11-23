@@ -116,7 +116,11 @@ main` → DB migrations → timed build. Three things worth knowing:
   itself; the timed build (`scripts/build-timed.sh`) runs `npm ci` before
   `npm run build`, and CI does the same. When `package.json` changes,
   regenerate the lockfile in the same commit (`npm install`) — an
-  out-of-sync lockfile fails every `npm ci` loudly.
+  out-of-sync lockfile fails every `npm ci` loudly. The host runs npm 12,
+  which blocks dependency install scripts unless they are listed in
+  `allowScripts` (package.json); the only candidates are `esbuild` (denied — it
+  runs from its prebuilt platform package) and macOS-only `fsevents`. Review
+  new ones with `npx -y npm@12 install-scripts ls`.
 
 The only manual deploy step: **new env vars in `.env` on the server** (via
 panel file manager or SSH). PRs that add a required env var must call this out
