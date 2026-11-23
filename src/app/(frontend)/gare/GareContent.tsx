@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { formatCccSeasonPeriod, getCccSeason } from '@/lib/ccc-season'
 import { uiSelectClass } from '@/lib/ui'
 
 function ChevronIcon({ open }: { open: boolean }) {
@@ -328,6 +329,10 @@ function HallOfFame() {
 }
 
 export function GareContent() {
+  // Stagione CCC corrente (1° ottobre → 30 settembre), calcolata dalla data
+  // odierna così il periodo non invecchia più a mano.
+  const cccSeasonPeriod = formatCccSeasonPeriod(getCccSeason())
+
   return (
     <main className="mx-auto max-w-5xl px-4 py-12">
       <h1 className="text-3xl font-bold text-cvlt-gray-900">Gare</h1>
@@ -343,7 +348,7 @@ export function GareContent() {
           La CCC è la competizione annuale di cross-country del CVLT, gestita tramite{' '}
           <ExternalLink href="https://www.xcontest.org/ccc-cvlt">XContest</ExternalLink>.
           I piloti soci caricano i propri voli GPS e vengono classificati automaticamente
-          in base ai 10 migliori risultati della stagione.
+          in base ai 6 migliori risultati della stagione.
         </p>
 
         <div className="mt-6 rounded-lg border border-cvlt-gray-200">
@@ -359,7 +364,7 @@ export function GareContent() {
               <div>
                 <h4 className="font-semibold text-cvlt-gray-900">Periodo</h4>
                 <p>
-                  Dal 1° ottobre 2025 al 30 settembre 2026 (12 mesi).
+                  {cccSeasonPeriod} (12 mesi).
                   I voli vanno caricati entro 14 giorni (standard XContest).
                 </p>
               </div>
@@ -375,19 +380,16 @@ export function GareContent() {
               <div>
                 <h4 className="font-semibold text-cvlt-gray-900">Categorie</h4>
                 <ul className="mt-1 list-inside list-disc space-y-1">
-                  <li><strong>Rondini</strong> &mdash; vele fino a EN-A</li>
-                  <li><strong>Nibbi</strong> &mdash; vele fino a EN-B</li>
-                  <li><strong>Aquile</strong> &mdash; vele fino a EN-C</li>
-                  <li><strong>Gipeti</strong> &mdash; vele fino a EN-D</li>
-                  <li><strong>Merli</strong> &mdash; parapendio tandem</li>
-                  <li><strong>Falchi</strong> &mdash; delta, tutte le omologazioni</li>
+                  <li><strong>Fun &amp; Safety</strong> &mdash; vele fino a EN-B</li>
+                  <li><strong>Sport Class</strong> &mdash; vele fino a EN-C</li>
+                  <li><strong>Open Class</strong> &mdash; vele fino a CCC (classe di competizione)</li>
                 </ul>
               </div>
               <div>
                 <h4 className="font-semibold text-cvlt-gray-900">Valutazione</h4>
                 <p>
                   Voli valutati secondo le regole del World XContest. Vengono considerati i
-                  10 migliori voli, senza distanza minima. Il decollo deve avvenire in Ticino o Moesano.
+                  6 migliori voli, senza distanza minima. Il decollo deve avvenire in Ticino o Moesano.
                 </p>
               </div>
               <div>
