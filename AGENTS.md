@@ -6,7 +6,7 @@ The site is live in production. Current work is iterating on details and adding 
 
 ## Production Setup
 - **Production**: `cvlt.ch` — pulls from `main` branch (Infomaniak hosting)
-- `dev` branch is the working branch — tested locally, then merged to `main` for production deploy
+- `main` is the integration branch: feature worktrees merge into it and `/deploy` pushes it (see "Git & Worktree Setup")
 
 ## Tech Stack (not negotiable)
 | Layer | Tech |
@@ -59,9 +59,10 @@ Italian only. Multilingual possible in the future (see TODO.md).
 Modern, clean, fast. Tailwind utility classes.
 
 ## Working Conventions
-- Work items are GitHub issues: `gh issue list` (migrated from the former TODO.md). Label vocabulary: `docs/agents/triage-labels.md`, tracker conventions: `docs/agents/issue-tracker.md`
+- Work items are GitHub issues in `ruben-hutter/cvlt-web`, via the `gh` CLI (`gh issue list`; migrated from the former TODO.md). Label vocabulary: `docs/agents/triage-labels.md` (default five-role vocabulary — label string = role name), tracker conventions: `docs/agents/issue-tracker.md`
 - `ready-for-agent` issues are fully specified — an agent can pick them up directly; `needs-triage` issues need scoping first
 - The `plans/` directory contains research/plan documents and detailed ticket specs referenced by issues
+- Domain docs: single-context `GLOSSARY.md` + `docs/adr/` at the repo root; conventions in `docs/agents/domain.md`
 
 ## Git & Worktree Setup
 
@@ -71,23 +72,25 @@ The bare repo lives at `/home/ruben/repos/cvlt/cvlt-web/` with a `.bare/` direct
 
 | Branch | Directory | Purpose |
 |:---|:---|:---|
-| `main` | `/home/ruben/repos/cvlt/cvlt-web/main` | Production (cvlt.ch) |
-| `dev` | `/home/ruben/repos/cvlt/cvlt-web/dev` | Development (local) |
-| `feat/*` | `/home/ruben/repos/cvlt/cvlt-web/feat-*` | Feature branches |
+| `main` | `/home/ruben/repos/cvlt/cvlt-web/main` | Integration branch — what Infomaniak pulls (cvlt.ch) |
+| `dev` | `/home/ruben/repos/cvlt/cvlt-web/dev` | Legacy, being retired (may still hold WIP) |
+| `feat/*` | `/home/ruben/repos/cvlt/cvlt-web/<name>` | Feature branches (one worktree per feature) |
 
-To create a new feature worktree (run from any existing worktree):
+To create a new feature worktree, use `wtree` (run from any existing worktree): `wtree feature <name> <brief-file>` creates `<repo>/<name>` on branch `feat/<name>` and installs the task brief as `TASK.md` there:
 ```bash
-git worktree add /home/ruben/repos/cvlt/cvlt-web/feat-<name> -b feat/<name>
+wtree feature <name> <brief-file>
 ```
 
 ### Deploy pipeline
-1. Work on `dev` branch (current directory is `/home/ruben/repos/cvlt/cvlt-web/dev`)
-2. Test locally with `npm run dev`
-3. Run the AI review: `bash scripts/ai-review.sh` (GitHub Copilot gpt-4.1 via the `gh` CLI; exit 2 = FAIL and blocks the deploy)
-4. Push to `origin dev`
-5. Create PR from dev to main (via `gh pr create`)
-6. Wait for CI to pass
-7. Merge PR → then click **Deploy** in the Infomaniak panel (merging alone does not deploy)
+`main` is the integration branch and is never edited or committed to directly. It only moves by fast-forward: `wtree finish` merges features in, `/deploy` pushes it, and `git pull --ff-only origin main` in the `main` worktree syncs it after a PR was merged on GitHub.
+
+1. Work in a feature worktree on `feat/<name>`; test locally with `npm run dev` there
+2. `wtree finish <name>` (from the main worktree session) — rebases `feat/<name>` onto `main` and fast-forward merges it. Finish gates: the full test suite passes in the worktree, `/skill:code-review` ran and its findings are addressed, the tree is clean
+3. `/deploy` from the `main` worktree (see `.pi/prompts/deploy.md`) — lint + typecheck, clean-`main` check, review gate `scripts/ai-review.sh` (GitHub Copilot gpt-4.1 via the `gh` CLI; exit 2 = FAIL and blocks the push), then `git push origin main`
+4. CI (`.github/workflows/ci.yml`) runs on every push to `main` as a post-push safety net — it no longer gates the deploy
+5. Click **Deploy** in the Infomaniak panel → the panel runs `scripts/deploy-timed.sh` on the host (git pull, migrations, build) and restarts the app. Pushing alone does not deploy.
+
+No more PRs from `dev` to `main`: PRs are no longer part of the normal path.
 
 ### Production deploy (Infomaniak panel)
 
@@ -114,12 +117,12 @@ panel file manager or SSH). PRs that add a required env var must call this out
 in the PR description. Verify a deploy by tailing `logs/deploy-timing.*.log`
 and `logs/server.log` on the host.
 
-### How to merge into main from the dev worktree
+### How to merge into main and deploy
 ```bash
-gh pr create --base main --head dev --title "deploy: description" --body "summary"
-gh pr merge <number> --merge
+# from the main worktree session, once the feature's finish gates pass:
+wtree finish <name>   # rebase feat/<name> onto main, fast-forward merge it
 ```
-Do NOT `git checkout main` in the dev worktree. Use PR-based merges via `gh`.
+Then `/deploy` in the `main` worktree session (review gate + `git push origin main`), then **Deploy** in the Infomaniak panel — steps 2–5 of the pipeline above.
 
 ### Commit conventions
 - Commit messages in English, imperative mood (e.g. "add contact section")
