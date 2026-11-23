@@ -8,8 +8,10 @@ Changes reach `main` only through `wtree finish` (feature worktree → fast-forw
 
 ## 1. Pre-flight checks
 Run lint and typecheck to ensure nothing is broken:
-- `npx next lint`
-- `npx tsc --noEmit`
+- Lint — only if an ESLint config exists in the repo root (set-up ticket: `plans/tickets/2026-10-20-setup-eslint.md`). Check: `find . -maxdepth 1 \( -name 'eslint.config.*' -o -name '.eslintrc*' \)`
+  - Prints a path → run `npx next lint`.
+  - Prints nothing → do NOT run `npx next lint` — without a config it opens ESLint's interactive setup prompt instead of linting. Note "no ESLint config — skipped (see the open set-up-ESLint ticket)" and continue.
+- Typecheck — always run: `npx tsc --noEmit`
 
 If there are errors, STOP and report them — do not proceed.
 
