@@ -79,6 +79,19 @@ const classifiche: { year: number; href: string }[] = [
 
 const cccHallOfFame: { year: number; link?: string; results: { cat: string; name: string; points: string }[] }[] = [
   {
+    year: 2026,
+    link: 'https://www.xcontest.org/2026/ccc-cvlt/voli',
+    results: [
+      { cat: 'Rondini (EN-A)', name: 'Giulio Scanavino', points: '597.10' },
+      { cat: 'Nibbi (EN-B)', name: 'Marcello Ancarola', points: '1498.89' },
+      { cat: 'Aquile (EN-C)', name: 'Matteo Daverio', points: '1730.43' },
+      { cat: 'Gipeti (EN-D)', name: 'Alex Leoni', points: '1935.26' },
+      { cat: 'Merli', name: 'Claudio Cattaneo', points: '154.70' },
+      { cat: 'Falchi', name: 'Lorenz Barchi', points: '91.09' },
+      { cat: 'Miglior donna', name: 'Jasmine Vismara (EN-B)', points: '1404.50' },
+    ],
+  },
+  {
     year: 2025,
     link: 'https://www.xcontest.org/2025/ccc-cvlt/voli',
     results: [
