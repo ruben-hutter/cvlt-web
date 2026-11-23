@@ -380,9 +380,9 @@ export function GareContent() {
               <div>
                 <h4 className="font-semibold text-cvlt-gray-900">Categorie</h4>
                 <ul className="mt-1 list-inside list-disc space-y-1">
-                  <li><strong>Fun &amp; Safety</strong> &mdash; vele fino a EN-B</li>
-                  <li><strong>Sport Class</strong> &mdash; vele fino a EN-C</li>
-                  <li><strong>Open Class</strong> &mdash; vele fino a CCC (classe di competizione)</li>
+                  <li><strong>Nibbi</strong> &mdash; vele fino a EN-B (Fun &amp; Safety)</li>
+                  <li><strong>Aquile</strong> &mdash; vele fino a EN-C (Sport Class)</li>
+                  <li><strong>Gipeti</strong> &mdash; vele fino a CCC (Open Class)</li>
                 </ul>
               </div>
               <div>
