@@ -86,7 +86,7 @@ wtree feature <name> <brief-file>
 
 1. Work in a feature worktree on `feat/<name>`; test locally with `npm run dev` there
 2. `wtree finish <name>` (from the main worktree session) — rebases `feat/<name>` onto `main` and fast-forward merges it. Finish gates: the full test suite passes in the worktree, `/skill:code-review` ran and its findings are addressed, the tree is clean
-3. `/deploy` from the `main` worktree (see `.pi/prompts/deploy.md`) — lint + typecheck, clean-`main` check, review gate `scripts/ai-review.sh` (GitHub Copilot gpt-4.1 via the `gh` CLI; exit 2 = FAIL and blocks the push), then `git push origin main`
+3. `/deploy` from the `main` worktree (see `.pi/prompts/deploy.md`) — dependency-tree check, lint + typecheck, clean-`main` check, review gate `scripts/ai-review.sh` (GitHub Copilot gpt-4.1 via the `gh` CLI; exit 2 = FAIL and blocks the push), then `git push origin main`
 4. CI (`.github/workflows/ci.yml`) runs on every push to `main` as a post-push safety net — it no longer gates the deploy
 5. Click **Deploy** in the Infomaniak panel → the panel runs `scripts/deploy-timed.sh` on the host (git pull, migrations, build) and restarts the app. Pushing alone does not deploy.
 
@@ -101,7 +101,7 @@ after the build command exits. SSH access exists (credentials via Infomaniak
 panel — never in this public repo).
 
 What `scripts/deploy-timed.sh` does on each panel deploy: `git pull origin
-main` → DB migrations → timed build. Two things worth knowing:
+main` → DB migrations → timed build. Three things worth knowing:
 
 - **Self-healing script**: the panel launches the checkout's copy of the script
   as it exists when deploy is clicked. If the pull updates the script itself,
@@ -111,6 +111,12 @@ main` → DB migrations → timed build. Two things worth knowing:
   `echo y` answers Payload's one-time prompt about the historic drizzle-push
   batch; committed migrations are safe to apply). Never run migrations
   manually after a deploy.
+- **Installs are `npm ci`** — `package-lock.json` is committed and is the single
+  source of truth for the dependency tree. `deploy-timed.sh` installs nothing
+  itself; the timed build (`scripts/build-timed.sh`) runs `npm ci` before
+  `npm run build`, and CI does the same. When `package.json` changes,
+  regenerate the lockfile in the same commit (`npm install`) — an
+  out-of-sync lockfile fails every `npm ci` loudly.
 
 The only manual deploy step: **new env vars in `.env` on the server** (via
 panel file manager or SSH). PRs that add a required env var must call this out
@@ -130,6 +136,7 @@ Then `/deploy` in the `main` worktree session (review gate + `git push origin ma
 - Never force push. Never use `--no-verify`.
 
 ## Build & Dev Commands
+- `npm ci` — install exactly `package-lock.json` (never `npm install` on the host or in CI)
 - `npm run dev` — dev server with Turbopack
 - `npm run build` — production build (includes Payload importmap generation)
 - `npm run start` — production start

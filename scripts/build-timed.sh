@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Timed build helper: measures local install/build durations.
+# Timed build helper: installs exactly package-lock.json (npm ci), then builds;
+# measures install/build durations.
 # Usage: bash scripts/build-timed.sh
 
 mkdir -p logs
@@ -33,7 +34,7 @@ run_step() {
 echo "=== CVLT timed build started at $(date) ===" | tee "${log_file}"
 
 {
-  run_step "npm install" npm install --no-audit --no-fund
+  run_step "npm ci" npm ci --no-audit --no-fund --prefer-offline
   run_step "npm run build" npm run build
 
   echo ""

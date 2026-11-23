@@ -15,8 +15,8 @@ Built with [Next.js](https://nextjs.org/) and [Payload CMS](https://payloadcms.c
 # 1. Copy the example env file and fill in your values
 cp .env.example .env
 
-# 2. Install dependencies
-npm install
+# 2. Install dependencies (exactly package-lock.json)
+npm ci
 
 # 3. Start the development server
 npm run dev

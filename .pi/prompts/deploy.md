@@ -7,7 +7,9 @@ You are deploying what is on `main` to production (cvlt.ch). Follow these steps 
 Changes reach `main` only through `wtree finish` (feature worktree → fast-forward merge into `main`); `main` is never edited directly. This prompt does not commit or merge anything — it validates, reviews and pushes `main`. The deploy itself is a manual step in the Infomaniak panel (step 6).
 
 ## 1. Pre-flight checks
-Run lint and typecheck to ensure nothing is broken:
+- Dependency tree — always run first: `npm ls --silent`. A non-zero exit means `node_modules` no longer matches `package.json` (missing or wrong-version packages, e.g. a dependency bump that was never installed locally); the typecheck below would then validate against that stale tree instead of what will be deployed. If it fails, only continue in the `main` worktree (`git branch --show-current` must print `main`, as in step 2 — `npm ci` deletes `node_modules`, so never run it from another worktree): run `npm ci --no-audit --no-fund` (installs exactly `package-lock.json`) and continue; if that install fails, STOP and report it — do not proceed.
+
+Then run lint and typecheck to ensure nothing is broken:
 - Lint — only if an ESLint config exists in the repo root (set-up ticket: `plans/tickets/2026-10-20-setup-eslint.md`). Check: `find . -maxdepth 1 \( -name 'eslint.config.*' -o -name '.eslintrc*' \)`
   - Prints a path → run `npx next lint`.
   - Prints nothing → do NOT run `npx next lint` — without a config it opens ESLint's interactive setup prompt instead of linting. Note "no ESLint config — skipped (see the open set-up-ESLint ticket)" and continue.
