@@ -5,6 +5,7 @@ import * as migration_20260413_120000_add_news_tag from './20260413_120000_add_n
 import * as migration_20260512_085603_add_contact_and_shop_tables from './20260512_085603_add_contact_and_shop_tables';
 import * as migration_20260519_161500_add_attachment_block from './20260519_161500_add_attachment_block';
 import * as migration_20260926_233700_add_alerted_at_to_shop_reservations from './20260926_233700_add_alerted_at_to_shop_reservations';
+import * as migration_20261123_205413_add_reset_password_requested_at_and_totp_attempts from './20261123_205413_add_reset_password_requested_at_and_totp_attempts';
 
 export const migrations = [
   {
@@ -41,5 +42,10 @@ export const migrations = [
     up: migration_20260926_233700_add_alerted_at_to_shop_reservations.up,
     down: migration_20260926_233700_add_alerted_at_to_shop_reservations.down,
     name: '20260926_233700_add_alerted_at_to_shop_reservations',
+  },
+  {
+    up: migration_20261123_205413_add_reset_password_requested_at_and_totp_attempts.up,
+    down: migration_20261123_205413_add_reset_password_requested_at_and_totp_attempts.down,
+    name: '20261123_205413_add_reset_password_requested_at_and_totp_attempts',
   },
 ];
