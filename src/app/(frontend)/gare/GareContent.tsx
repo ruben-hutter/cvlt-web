@@ -52,12 +52,9 @@ function ExternalLink({ href, children }: { href: string; children: React.ReactN
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex items-center gap-1 font-medium text-cvlt-blue transition-colors hover:text-cvlt-blue-dark"
+      className="font-medium text-cvlt-blue transition-colors hover:text-cvlt-blue-dark"
     >
       {children}
-      <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-4.5-6H18m0 0v4.5m0-4.5L10.5 13.5" />
-      </svg>
     </a>
   )
 }
@@ -67,58 +64,30 @@ const hikeAndFlyRaces = [
   { date: '30.5', backup: '31.5', name: 'Ticino X-Race', organizer: 'Matteo Monzeglio', location: 'Tesserete', catOpen: true, catFun: true, href: '/calendario/ticino-x-race', cancelled: true },
   { date: '20.6', backup: '21.6', name: 'Coppa Monte Generoso', organizer: 'TVLMG', location: 'Mendrisio', catOpen: true, catFun: true, href: '/calendario/coppa-monte-generoso' },
   { date: '19.9', backup: '20.9', name: 'Run in Fly', organizer: 'Gael Droz', location: 'Locarno', catOpen: true, catFun: true, href: '/calendario/run-in-fly-gia-belli-in-fly-2' },
-  { date: '26–27.9', backup: '3–4.10', name: 'Lema Air', organizer: 'Claudio Cattaneo', location: 'Miglieglia', catOpen: true, catFun: false, href: '/calendario/lema-air' },
+  { date: '26–27.9', backup: '3–4.10', name: 'Lema Air', organizer: 'Claudio Cattaneo', location: 'Miglieglia', catOpen: true, catFun: false, href: '/calendario/lema-air', cancelled: true },
 ]
 
-const classificaRaces = ['MisoXperience', 'Coppa M. Generoso', 'Run in Fly', 'Lema Air']
-
-type classificaPilotEntry = { name: string; races: (number | null)[] }
-const classifica2026: classificaPilotEntry[] = [
-  { name: 'Etan Studer', races: [85, 50, null, null] },
-  { name: 'Aaron Mathis', races: [100, null, null, null] },
-  { name: 'Elia Sartoris', races: [null, 100, null, null] },
-  { name: 'Deborah Acierno', races: [60, 28, null, null] },
-  { name: 'Anton Soekeland', races: [null, 85, null, null] },
-  { name: 'Fabian Guggisberg', races: [70, null, null, null] },
-  { name: 'Tennessee Candelari', races: [null, 70, null, null] },
-  { name: 'Pietro Zala', races: [60, null, null, null] },
-  { name: 'Andrea Iati', races: [null, 60, null, null] },
-  { name: 'Stefano Tonello', races: [null, 55, null, null] },
-  { name: 'Renzo Zanotta', races: [null, 50, null, null] },
-  { name: 'Claudia Acerbis', races: [null, 45, null, null] },
-  { name: 'Antony Quarry', races: [null, 43, null, null] },
-  { name: 'Vittorio Scartazzini', races: [null, 40, null, null] },
-  { name: 'Alex Bernasconi', races: [null, 35, null, null] },
-  { name: 'Katrina Merckle', races: [null, 35, null, null] },
-  { name: 'Siegfried Studer', races: [null, 30, null, null] },
-  { name: 'Tamara Hobi', races: [null, 30, null, null] },
-  { name: 'Jan Schmid', races: [null, 29, null, null] },
-  { name: 'Fabrizio Coduri', races: [null, 27, null, null] },
-  { name: 'Luca Limido', races: [null, 25, null, null] },
-  { name: 'Diego Uccellani', races: [null, 22, null, null] },
-  { name: 'Marco Marciani', races: [null, 20, null, null] },
-  { name: 'Luca Bernaschina', races: [null, 18, null, null] },
-  { name: 'Stefano Maffioletti', races: [null, 15, null, null] },
-  { name: 'Marco Dorici', races: [null, 14, null, null] },
-  { name: 'Daniele Tessaro', races: [null, 13, null, null] },
-  { name: 'Juan Quadri', races: [null, 12, null, null] },
-  { name: 'Hugo Cardoso', races: [null, 12, null, null] },
-  { name: 'Sacha Kessel', races: [null, 10, null, null] },
-  { name: 'Lorenzo Naso', races: [null, 9, null, null] },
-  { name: 'Diego Bodini', races: [null, 8, null, null] },
-  { name: 'Fabrizio Ronchetti', races: [null, 7, null, null] },
-  { name: 'Jan Buchli', races: [null, 6, null, null] },
-  { name: 'Julien Bucciarelli', races: [null, 5, null, null] },
-  { name: 'Sofie Fiori', races: [null, 4, null, null] },
-  { name: 'Giacomo Waltenspühl', races: [null, 3, null, null] },
-  { name: 'Michele Facco', races: [null, 2, null, null] },
-  { name: 'Fernando Waltenspühl', races: [null, 1, null, null] },
-  { name: 'Maurizio Carluccio', races: [null, 0, null, null] },
-  { name: 'Nadir Dazzi', races: [null, 0, null, null] },
-  { name: 'Matteo Paolocci', races: [null, 0, null, null] },
+// Classifiche annuali del campionato, pubblicate come PDF scaricabile.
+// Per ogni anno: copiare il PDF in public/classifiche/ (vedi README lì dentro,
+// naming: classifica-<anno>.pdf) e aggiungere una voce a quest'array.
+const classifiche: { year: number; href: string }[] = [
+  { year: 2026, href: '/classifiche/classifica-2026.pdf' },
 ]
 
 const cccHallOfFame: { year: number; link?: string; results: { cat: string; name: string; points: string }[] }[] = [
+  {
+    year: 2026,
+    link: 'https://www.xcontest.org/2026/ccc-cvlt/voli',
+    results: [
+      { cat: 'Rondini (EN-A)', name: 'Giulio Scanavino', points: '597.10' },
+      { cat: 'Nibbi (EN-B)', name: 'Marcello Ancarola', points: '1498.89' },
+      { cat: 'Aquile (EN-C)', name: 'Matteo Daverio', points: '1730.43' },
+      { cat: 'Gipeti (EN-D)', name: 'Alex Leoni', points: '1935.26' },
+      { cat: 'Merli', name: 'Claudio Cattaneo', points: '154.70' },
+      { cat: 'Falchi', name: 'Lorenz Barchi', points: '91.09' },
+      { cat: 'Miglior donna', name: 'Jasmine Vismara (EN-B)', points: '1404.50' },
+    ],
+  },
   {
     year: 2025,
     link: 'https://www.xcontest.org/2025/ccc-cvlt/voli',
@@ -316,18 +285,20 @@ function HallOfFame() {
 
   return (
     <div>
-      <div className="mb-4 flex items-center gap-3">
-        <select
-          value={selectedYear}
-          onChange={(e) => setSelectedYear(Number(e.target.value))}
-          className={`${uiSelectClass} w-auto border-cvlt-gray-200 py-1.5 font-medium shadow-sm`}
-        >
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <div className="w-32">
+          <select
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(Number(e.target.value))}
+            className={`${uiSelectClass} font-medium shadow-sm`}
+          >
           {cccHallOfFame.map((e) => (
             <option key={e.year} value={e.year}>
               {e.year}
             </option>
           ))}
-        </select>
+          </select>
+        </div>
         {entry.link && (
           <ExternalLink href={entry.link}>Classifica completa</ExternalLink>
         )}
@@ -349,54 +320,6 @@ function HallOfFame() {
                 <td className="py-1.5 text-right tabular-nums">{r.points}</td>
               </tr>
             ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  )
-}
-
-function ClassificaTable({ title, pilots }: { title?: string; pilots: classificaPilotEntry[] }) {
-  return (
-    <div>
-      {title ? <h4 className="mb-2 text-sm font-semibold uppercase tracking-wide text-cvlt-gray-500">{title}</h4> : null}
-      <div className="overflow-x-auto">
-        <table className="w-full table-fixed text-left text-sm">
-          <colgroup>
-            <col style={{ width: '6%' }} />
-            <col style={{ width: '30%' }} />
-            <col style={{ width: '13%' }} />
-            <col style={{ width: '16%' }} />
-            <col style={{ width: '13%' }} />
-            <col style={{ width: '12%' }} />
-            <col style={{ width: '10%' }} />
-          </colgroup>
-          <thead>
-            <tr className="border-b border-cvlt-gray-200 text-xs font-semibold uppercase tracking-wide text-cvlt-gray-500">
-              <th className="pb-2 pr-3">#</th>
-              <th className="pb-2 pr-3">Pilota</th>
-              {classificaRaces.map((r) => (
-                <th key={r} className="pb-2 pr-3 text-center">{r}</th>
-              ))}
-              <th className="pb-2 text-right">Totale</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pilots.map((pilot, i) => {
-              const total = pilot.races.reduce<number>((sum, p) => sum + (p ?? 0), 0)
-              return (
-                <tr key={pilot.name} className="border-b border-cvlt-gray-100 last:border-b-0">
-                  <td className="py-1.5 pr-3 text-cvlt-gray-500">{i + 1}</td>
-                  <td className="py-1.5 pr-3 font-medium text-cvlt-gray-900">{pilot.name}</td>
-                  {pilot.races.map((pts, j) => (
-                    <td key={j} className="py-1.5 pr-3 text-center tabular-nums text-cvlt-gray-700">
-                      {pts !== null ? pts : '-'}
-                    </td>
-                  ))}
-                  <td className="py-1.5 text-right font-semibold tabular-nums text-cvlt-gray-900">{total}</td>
-                </tr>
-              )
-            })}
           </tbody>
         </table>
       </div>
@@ -625,8 +548,26 @@ export function GareContent() {
             </div>
           </Section>
 
-          <Section title="Classifica 2026">
-            <ClassificaTable pilots={classifica2026} />
+          <Section title="Classifiche">
+            <p>
+              Le classifiche complete dei campionati, con tutti i piloti classificati di ogni
+              categoria, sono disponibili in formato PDF.
+            </p>
+            <div className="mt-4 divide-y divide-cvlt-gray-100 rounded-lg border border-cvlt-gray-200">
+              {classifiche.map((c) => (
+                <a
+                  key={c.year}
+                  href={c.href}
+                  download
+                  className="flex items-center justify-between gap-4 px-4 py-3 transition-colors hover:bg-cvlt-gray-50"
+                >
+                  <span className="font-medium text-cvlt-gray-900">{c.year}</span>
+                  <svg className="h-4 w-4 shrink-0 text-cvlt-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                  </svg>
+                </a>
+              ))}
+            </div>
           </Section>
         </div>
       </div>
