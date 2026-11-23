@@ -70,169 +70,16 @@ const hikeAndFlyRaces = [
   { date: '26–27.9', backup: '3–4.10', name: 'Lema Air', organizer: 'Claudio Cattaneo', location: 'Miglieglia', catOpen: true, catFun: false, href: '/calendario/lema-air', cancelled: true },
 ]
 
-const classificaRaces = ['MisoXperience', 'Coppa M. Generoso', 'Run in Fly']
-
-type classificaPilotEntry = { name: string; races: (number | null)[] }
-const classifica2026: classificaPilotEntry[] = [
-// Punti assegnati secondo le scale posto-per-posto del Campionato ticinese di H&F
-// (Open = Extreme: 100, 85, 70, 60, 55, 50, 45, 40, 35, 30, 29, 28; Fun = Adventure:
-// 50, 43, 35, 30, 27, 25, 22, 20, 18, 15, 14, 13, 12, 12), come pubblicato su
-// teamvlmg.wixsite.com/handf2026. Donne e uomini sono uniti in un'unica classifica
-// per categoria. La coda della scala e' allungata linearmente fino all'ultimo
-// posto in gara (minimo 1 punto), perche' le scale ufficiali prevedevano al massimo
-// ~40 piloti Open / ~25 Fun. Ultimo aggiornamento: Run in Fly (19.9.2026).
-  { name: 'Etan Studer', races: [85, 50, 10] },
-  { name: 'Basile Marclay', races: [null, null, 100] },
-  { name: 'Aaron Mathis', races: [100, null, null] },
-  { name: 'Elia Sartoris', races: [null, 100, null] },
-  { name: 'Deborah Acierno', races: [60, 28, 7] },
-  { name: 'Michael Repond', races: [null, null, 85] },
-  { name: 'Anton Soekeland', races: [null, 85, null] },
-  { name: 'Nicola Heiniger', races: [null, null, 70] },
-  { name: 'Fabian Guggisberg', races: [70, null, null] },
-  { name: 'Tennessee Candelari', races: [null, 70, null] },
-  { name: 'Maëlle Minnig', races: [null, null, 60] },
-  { name: 'Pietro Zala', races: [60, null, null] },
-  { name: 'Andrea Iati', races: [null, 60, null] },
-  { name: 'Fabrizio Coduri', races: [null, 27, 30] },
-  { name: 'Joël Bruchez', races: [null, null, 55] },
-  { name: 'Stefano Tonello', races: [null, 55, null] },
-  { name: 'Camille Van Robaeys', races: [null, null, 50] },
-  { name: 'Lia Sutter', races: [null, null, 50] },
-  { name: 'Renzo Zanotta', races: [null, 50, null] },
-  { name: 'Antony Quarry', races: [null, 43, 6] },
-  { name: 'Dominik Giger', races: [null, null, 45] },
-  { name: 'Claudia Acerbis', races: [null, 45, null] },
-  { name: 'Diego Uccellani', races: [null, 22, 22] },
-  { name: 'Philipp Rothenbühler', races: [null, null, 43] },
-  { name: 'Rafael Hunziker', races: [null, null, 40] },
-  { name: 'Alex Bernasconi', races: [null, 35, 5] },
-  { name: 'Vittorio Scartazzini', races: [null, 40, null] },
-  { name: 'Massimo Gulli', races: [null, null, 35] },
-  { name: 'Olivier Beer', races: [null, null, 35] },
-  { name: 'Katrina Merckle', races: [null, 35, null] },
-  { name: 'Siegfried Studer', races: [null, 30, 4] },
-  { name: 'Giorgia Sugliano', races: [null, null, 30] },
-  { name: 'Tamara Hobi', races: [null, 30, null] },
-  { name: 'Brian Allaman', races: [null, null, 29] },
-  { name: 'Jan Schmid', races: [null, 29, null] },
-  { name: 'Fanny Bühlmann', races: [null, null, 28] },
-  { name: 'Laurent Schwab', races: [null, null, 27] },
-  { name: 'Marco Moor', races: [null, null, 27] },
-  { name: 'Matas Batutis', races: [null, null, 27] },
-  { name: 'Jonas Hofer', races: [null, null, 26] },
-  { name: 'Peider Stocker', races: [null, null, 26] },
-  { name: 'Matteo Gozzoli', races: [null, null, 25] },
-  { name: 'Matthews Pellegrini / Oxana Bätscher (PAX)', races: [null, null, 25] },
-  { name: 'Mattia Bianchini', races: [null, null, 25] },
-  { name: 'Samuel Mocettini', races: [null, null, 25] },
-  { name: 'Luca Limido', races: [null, 25, null] },
-  { name: 'Luca Morelli', races: [null, null, 24] },
-  { name: 'Nicola Eschbach', races: [null, null, 24] },
-  { name: 'Patrick Von Känel', races: [null, null, 24] },
-  { name: 'Hugo Cardoso', races: [null, 12, 12] },
-  { name: 'Fabian Buschor', races: [null, null, 23] },
-  { name: 'Stefano Moser', races: [null, null, 23] },
-  { name: 'Marco Zweili', races: [null, null, 22] },
-  { name: 'Nino Zogg', races: [null, null, 22] },
-  { name: 'Noah Codoni', races: [null, null, 22] },
-  { name: 'Julie Gremaud', races: [null, null, 21] },
-  { name: 'Louis Codoni', races: [null, null, 21] },
-  { name: 'Giovanni Soldati', races: [null, null, 20] },
-  { name: 'Idris Birch', races: [null, null, 20] },
-  { name: 'Lorenz Barchi / Mirko (PAX)', races: [null, null, 20] },
-  { name: 'Vincent Van de Vijfeijken', races: [null, null, 20] },
-  { name: 'Marco Marciani', races: [null, 20, null] },
-  { name: 'Leda Leonardi Orso', races: [null, null, 19] },
-  { name: 'Nicole Turuani', races: [null, null, 19] },
-  { name: 'Andrea Leuthard', races: [null, null, 18] },
-  { name: 'Pietro Gioli', races: [null, null, 18] },
-  { name: 'Samira Bregy', races: [null, null, 18] },
-  { name: 'Sylvain Simonet', races: [null, null, 18] },
-  { name: 'Luca Bernaschina', races: [null, 18, null] },
-  { name: 'Federico Ceschi', races: [null, null, 17] },
-  { name: 'Julien Doebelin Esquitino', races: [null, null, 17] },
-  { name: 'Laure Zueblin', races: [null, null, 17] },
-  { name: 'Christof Schoch', races: [null, null, 16] },
-  { name: 'Eric Louvard', races: [null, null, 16] },
-  { name: 'Arno Gubser', races: [null, null, 15] },
-  { name: 'Julia Jungo', races: [null, null, 15] },
-  { name: 'Maël Wiget', races: [null, null, 15] },
-  { name: 'Sébastien Baumgartner', races: [null, null, 15] },
-  { name: 'Stefano Maffioletti', races: [null, 15, null] },
-  { name: 'Marco Fenk', races: [null, null, 14] },
-  { name: 'Mihai Lazar', races: [null, null, 14] },
-  { name: 'Timothy Phil Scandella', races: [null, null, 14] },
-  { name: 'Marco Dorici', races: [null, 14, null] },
-  { name: 'Jannis Lauffer', races: [null, null, 13] },
-  { name: 'Matteo Monzeglio', races: [null, null, 13] },
-  { name: 'Riccardo Riva', races: [null, null, 13] },
-  { name: 'Sébastien Holvoet', races: [null, null, 13] },
-  { name: 'Daniele Tessaro', races: [null, 13, null] },
-  { name: 'Guillaume Ruffieux', races: [null, null, 12] },
-  { name: 'Sandro Gubser', races: [null, null, 12] },
-  { name: 'Sean Boran', races: [null, null, 12] },
-  { name: 'Juan Quadri', races: [null, 12, null] },
-  { name: 'Dario Zogg', races: [null, null, 11] },
-  { name: 'Davide Cattaneo', races: [null, null, 11] },
-  { name: 'Simone Guglielmini', races: [null, null, 11] },
-  { name: 'Aleksandar Bozovic', races: [null, null, 10] },
-  { name: 'Jamin Demenga / Lara Bini (PAX)', races: [null, null, 10] },
-  { name: 'Julian Kupski', races: [null, null, 10] },
-  { name: 'Mathieu Rohner', races: [null, null, 10] },
-  { name: 'Sacha Kessel', races: [null, 10, null] },
-  { name: 'Alex Del Fedele', races: [null, null, 9] },
-  { name: 'Georg Mumenthaler', races: [null, null, 9] },
-  { name: 'Jonathan Huschka', races: [null, null, 9] },
-  { name: 'Selina Marti', races: [null, null, 9] },
-  { name: 'Lorenzo Naso', races: [null, 9, null] },
-  { name: 'Cello Bartholdi', races: [null, null, 8] },
-  { name: 'Damien Carrara', races: [null, null, 8] },
-  { name: 'Frederic Forny', races: [null, null, 8] },
-  { name: 'Jeanine Guajana', races: [null, null, 8] },
-  { name: 'Marylin Prahin', races: [null, null, 8] },
-  { name: 'Philippe Simonet', races: [null, null, 8] },
-  { name: 'Diego Bodini', races: [null, 8, null] },
-  { name: 'Elia Franscioni', races: [null, null, 7] },
-  { name: 'Sandro Urban', races: [null, null, 7] },
-  { name: 'Yannick Voegeli', races: [null, null, 7] },
-  { name: 'Fabrizio Ronchetti', races: [null, 7, null] },
-  { name: 'Fabrizio Bisi', races: [null, null, 6] },
-  { name: 'Kai Berton', races: [null, null, 6] },
-  { name: 'Loranne Berger', races: [null, null, 6] },
-  { name: 'Sijei Scolari', races: [null, null, 6] },
-  { name: 'Vincent Marclay', races: [null, null, 6] },
-  { name: 'Jan Buchli', races: [null, 6, null] },
-  { name: 'Angelo Guainazzi', races: [null, null, 5] },
-  { name: 'Roberta Banfi', races: [null, null, 5] },
-  { name: 'Sandy Robatel', races: [null, null, 5] },
-  { name: 'Tiziana Curcio', races: [null, null, 5] },
-  { name: 'Julien Bucciarelli', races: [null, 5, null] },
-  { name: 'Saskia Cadisch', races: [null, null, 4] },
-  { name: 'Sébastien Taracido', races: [null, null, 4] },
-  { name: 'Vincent Schaffter', races: [null, null, 4] },
-  { name: 'Vinicio Bosshard', races: [null, null, 4] },
-  { name: 'Yohan Perroud', races: [null, null, 4] },
-  { name: 'Sofie Fiori', races: [null, 4, null] },
-  { name: 'Camille Girardet', races: [null, null, 3] },
-  { name: 'Enea Mellini', races: [null, null, 3] },
-  { name: 'Jasmin Berton', races: [null, null, 3] },
-  { name: 'Linda Costales', races: [null, null, 3] },
-  { name: 'Michaela Mooz', races: [null, null, 3] },
-  { name: 'Giacomo Waltenspühl', races: [null, 3, null] },
-  { name: 'Claudio Tanadini', races: [null, null, 2] },
-  { name: 'Fabien In-Albon', races: [null, null, 2] },
-  { name: 'Miriam Preinfalk', races: [null, null, 2] },
-  { name: 'Sandrine Zweili', races: [null, null, 2] },
-  { name: 'Michele Facco', races: [null, 2, null] },
-  { name: 'Claudio Vosti', races: [null, null, 1] },
-  { name: 'Jasmin Wettmer', races: [null, null, 1] },
-  { name: 'Marco Federspiel', races: [null, null, 1] },
-  { name: 'Pit Schönenberger', races: [null, null, 1] },
-  { name: 'Fernando Waltenspühl', races: [null, 1, null] },
-  { name: 'Matteo Paolocci', races: [null, 0, null] },
-  { name: 'Maurizio Carluccio', races: [null, 0, null] },
-  { name: 'Nadir Dazzi', races: [null, 0, null] },
+// Classifiche annuali del campionato, pubblicate come PDF scaricabile.
+// Per ogni anno: copiare il PDF in public/classifiche/ (vedi README lì dentro,
+// naming: classifica-<anno>.pdf) e aggiungere una voce a quest'array.
+const classifiche: { year: number; label: string; note?: string; href?: string }[] = [
+  {
+    year: 2026,
+    label: 'Campionato ticinese Hike & Fly',
+    note: 'MisoXperience · Coppa Monte Generoso · Run in Fly — 152 piloti',
+    href: '/classifiche/classifica-2026.pdf',
+  },
 ]
 
 const cccHallOfFame: { year: number; link?: string; results: { cat: string; name: string; points: string }[] }[] = [
@@ -473,53 +320,6 @@ function HallOfFame() {
   )
 }
 
-function ClassificaTable({ title, pilots }: { title?: string; pilots: classificaPilotEntry[] }) {
-  return (
-    <div>
-      {title ? <h4 className="mb-2 text-sm font-semibold uppercase tracking-wide text-cvlt-gray-500">{title}</h4> : null}
-      <div className="overflow-x-auto">
-        <table className="w-full table-fixed text-left text-sm">
-          <colgroup>
-            <col style={{ width: '7%' }} />
-            <col style={{ width: '34%' }} />
-            <col style={{ width: '17%' }} />
-            <col style={{ width: '19%' }} />
-            <col style={{ width: '14%' }} />
-            <col style={{ width: '9%' }} />
-          </colgroup>
-          <thead>
-            <tr className="border-b border-cvlt-gray-200 text-xs font-semibold uppercase tracking-wide text-cvlt-gray-500">
-              <th className="pb-2 pr-3">#</th>
-              <th className="pb-2 pr-3">Pilota</th>
-              {classificaRaces.map((r) => (
-                <th key={r} className="pb-2 pr-3 text-center">{r}</th>
-              ))}
-              <th className="pb-2 text-right">Totale</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pilots.map((pilot, i) => {
-              const total = pilot.races.reduce<number>((sum, p) => sum + (p ?? 0), 0)
-              return (
-                <tr key={pilot.name} className="border-b border-cvlt-gray-100 last:border-b-0">
-                  <td className="py-1.5 pr-3 text-cvlt-gray-500">{i + 1}</td>
-                  <td className="py-1.5 pr-3 font-medium text-cvlt-gray-900">{pilot.name}</td>
-                  {pilot.races.map((pts, j) => (
-                    <td key={j} className="py-1.5 pr-3 text-center tabular-nums text-cvlt-gray-700">
-                      {pts !== null ? pts : '-'}
-                    </td>
-                  ))}
-                  <td className="py-1.5 text-right font-semibold tabular-nums text-cvlt-gray-900">{total}</td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  )
-}
-
 export function GareContent() {
   return (
     <main className="mx-auto max-w-5xl px-4 py-12">
@@ -741,8 +541,30 @@ export function GareContent() {
             </div>
           </Section>
 
-          <Section title="Classifica 2026">
-            <ClassificaTable pilots={classifica2026} />
+          <Section title="Classifiche">
+            <p>
+              Le classifiche complete dei campionati, con tutti i piloti classificati di ogni
+              categoria, sono disponibili in formato PDF.
+            </p>
+            <div className="mt-4 divide-y divide-cvlt-gray-100 rounded-lg border border-cvlt-gray-200">
+              {classifiche.map((c) => (
+                <a
+                  key={c.year}
+                  href={c.href}
+                  download
+                  className="flex items-center justify-between gap-4 px-4 py-3 transition-colors hover:bg-cvlt-gray-50"
+                >
+                  <span>
+                    <span className="font-medium text-cvlt-gray-900">{c.year}</span>
+                    <span className="text-cvlt-gray-700"> — {c.label}</span>
+                    {c.note ? <span className="block text-xs text-cvlt-gray-500">{c.note}</span> : null}
+                  </span>
+                  <svg className="h-4 w-4 shrink-0 text-cvlt-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                  </svg>
+                </a>
+              ))}
+            </div>
           </Section>
         </div>
       </div>
