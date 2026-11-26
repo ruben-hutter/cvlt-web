@@ -112,7 +112,20 @@ function isWpPhpFile(pathname: string) {
   return pathname.endsWith('.php')
 }
 
+const APEX_URL = 'https://cvlt.ch'
+
 export function proxy(request: NextRequest) {
+  // Redirect the www host to the apex so a single host serves content (301
+  // preserves path + query, and runs before the WP-410 logic so old WP URLs
+  // requested on www get the redirect, not a gone). Infomaniak's reverse proxy
+  // forwards one of these headers; on localhost neither is www.cvlt.ch.
+  const host = request.headers.get('x-forwarded-host')?.split(',')[0].trim()
+    || request.headers.get('host')
+  if (host === 'www.cvlt.ch') {
+    const url = new URL(request.nextUrl.pathname + request.nextUrl.search, APEX_URL)
+    return NextResponse.redirect(url, 301)
+  }
+
   const pathname = request.nextUrl.pathname
 
   if (shouldSkip(pathname)) {
