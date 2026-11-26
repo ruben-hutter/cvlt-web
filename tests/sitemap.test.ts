@@ -17,6 +17,10 @@ const PUBLISHED_NEWS = [
 ]
 const DRAFT_NEWS = [{ slug: 'draft-article', updatedAt: '2026-01-16T10:00:00.000Z' }]
 const EVENTS = [{ slug: 'autunno-blitz-2026', updatedAt: '2026-01-10T10:00:00.000Z' }]
+const ALBUMS = [
+  { slug: 'mandello-2025', updatedAt: '2026-02-01T10:00:00.000Z' },
+  { slug: 'tandem-2025', updatedAt: '2026-02-02T10:00:00.000Z' },
+]
 
 function fakeDocs() {
   find.mockImplementation(async ({ collection }: { collection: string }) => {
@@ -25,6 +29,7 @@ function fakeDocs() {
       // sitemap passes — the where-clause itself is asserted separately.
       case 'news': return { docs: PUBLISHED_NEWS }
       case 'events': return { docs: EVENTS }
+      case 'photo-albums': return { docs: ALBUMS }
       default: return { docs: [] }
     }
   })
@@ -55,6 +60,18 @@ describe('sitemap', () => {
 
     expect(urls).toContain('https://cvlt.ch/notizie/published-article')
     expect(urls).not.toContain('https://cvlt.ch/notizie/draft-article')
+  })
+
+  it('emits photo album pages under /galleria/ with monthly frequency', async () => {
+    const entries = await sitemap()
+
+    for (const album of ALBUMS) {
+      const entry = entries.find(e => e.url === `https://cvlt.ch/galleria/${album.slug}`)
+      expect(entry).toBeDefined()
+      expect(entry!.changeFrequency).toBe('monthly')
+      expect(entry!.priority).toBe(0.4)
+      expect((entry!.lastModified as Date).toISOString()).toBe(album.updatedAt)
+    }
   })
 
   it('still includes events and the static pages', async () => {

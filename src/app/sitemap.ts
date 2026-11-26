@@ -58,7 +58,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.6,
     }))
 
-    return [...staticPages, ...newsPages, ...eventPages]
+    // Album pages are public and linked from /galleria but were missing from
+    // the sitemap entirely.
+    const albums = await payload.find({
+      collection: 'photo-albums',
+      limit: 0,
+      select: { slug: true, updatedAt: true },
+    })
+
+    const albumPages: MetadataRoute.Sitemap = albums.docs.map((doc) => ({
+      url: `${BASE_URL}/galleria/${doc.slug}`,
+      lastModified: new Date(doc.updatedAt as string),
+      changeFrequency: 'monthly' as const,
+      priority: 0.4,
+    }))
+
+    return [...staticPages, ...newsPages, ...eventPages, ...albumPages]
   } catch {
     return staticPages
   }
