@@ -65,3 +65,17 @@ describe('proxy WP query param handling', () => {
     expect(res.status).toBe(410)
   })
 })
+
+describe('proxy WP legacy path 410s', () => {
+  it('410s old BGMP placemark posts', () => {
+    const res = proxy(request('https://cvlt.ch/placemarks/aeroporto-ascona', { host: 'cvlt.ch' }))
+    expect(res.status).toBe(410)
+  })
+
+  it('410s /events/ slugs that have no recurring-event successor', () => {
+    // The 51 mapped event editions are redirected by next.config before the
+    // proxy runs; everything else under /events/ is gone.
+    const res = proxy(request('https://cvlt.ch/events/nome-che-non-esiste', { host: 'cvlt.ch' }))
+    expect(res.status).toBe(410)
+  })
+})

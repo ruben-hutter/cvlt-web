@@ -63,6 +63,9 @@ const wpGonePrefixes = [
   '/category/', '/tag/', '/author/', '/archives/',
   '/date/', '/blog/', '/comments/', '/search/',
   '/page/', '/feed/', '/events/',
+  // Old BGMP placemark custom posts (launch/landing site markers),
+  // replaced by /info-volo and /vento.
+  '/placemarks/',
 ]
 
 const wpGoneSuffixes = [
