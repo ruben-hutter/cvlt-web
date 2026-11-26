@@ -25,10 +25,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     const payload = await getPayload({ config })
 
+    // Mirror the article page's visibility rules: only published, already
+    // released articles are renderable — everything else 404s and must not
+    // be listed in the sitemap.
     const news = await payload.find({
       collection: 'news',
       limit: 0,
       select: { slug: true, updatedAt: true },
+      where: {
+        status: { equals: 'published' },
+        publishDate: { less_than_equal: new Date().toISOString() },
+      },
     })
 
     const newsPages: MetadataRoute.Sitemap = news.docs.map((doc) => ({
