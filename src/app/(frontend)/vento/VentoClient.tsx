@@ -231,6 +231,7 @@ const STATION_REGIONS: Record<string, string> = {
   'SLF-Pian Grand': 'alpi',
   'SLF-Predanass': 'alpi',
   'SLF-Lucendro': 'alpi',
+  'SLF-Sabbioni': 'alpi',
   'SLF-Bombögn Wind': 'alpi',
   'WBD-StaMariaGR': 'sopraceneri',
   'SLF-Porcaresc': 'sopraceneri',

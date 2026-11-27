@@ -75,11 +75,12 @@ export async function fetchWithTimeout(
   timeoutMs = 8000,
   retries = 2,
   retryDelayMs = 1500,
+  fetchImpl: typeof fetch = fetch,
 ): Promise<Response> {
   let lastError: unknown
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
-      return await fetch(url, {
+      return await fetchImpl(url, {
         signal: AbortSignal.timeout(timeoutMs),
         headers: { 'User-Agent': 'Mozilla/5.0' },
       })

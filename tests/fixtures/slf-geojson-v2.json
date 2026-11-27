@@ -1,0 +1,401 @@
+{
+ "type": "FeatureCollection",
+ "features": [
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     9.8194108372,
+     46.6988884749,
+     2558
+    ]
+   },
+   "properties": {
+    "network": "IMIS",
+    "code": "DAV2",
+    "elevation": 2558,
+    "label": "B\u00e4rent\u00e4lli",
+    "type": "SNOW_FLAT",
+    "manual": false,
+    "value": -7.24,
+    "timestamp": "2026-11-27T12:30:00Z",
+    "fill": "#70a1ea"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     8.6137900109,
+     46.5490383567,
+     2268
+    ]
+   },
+   "properties": {
+    "network": "IMIS",
+    "code": "VAL2",
+    "elevation": 2268,
+    "label": "Vallascia",
+    "type": "SNOW_FLAT",
+    "manual": false,
+    "value": -0.784,
+    "timestamp": "2026-11-27T12:30:00Z",
+    "fill": "#fffff0"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     8.7174724568,
+     46.4657248139,
+     2216
+    ]
+   },
+   "properties": {
+    "network": "IMIS",
+    "code": "CAM2",
+    "elevation": 2216,
+    "label": "Fontane",
+    "type": "SNOW_FLAT",
+    "manual": false,
+    "value": -5.331,
+    "timestamp": "2026-11-27T12:00:00Z",
+    "fill": "#70a1ea"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     8.8690602761,
+     46.5428657406,
+     2057
+    ]
+   },
+   "properties": {
+    "network": "IMIS",
+    "code": "DTR2",
+    "elevation": 2057,
+    "label": "Preda",
+    "type": "SNOW_FLAT",
+    "manual": false,
+    "value": 1.595,
+    "timestamp": "2026-11-27T12:30:00Z",
+    "fill": "#ffccc4"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     8.8669171273,
+     46.4651037066,
+     2299
+    ]
+   },
+   "properties": {
+    "network": "IMIS",
+    "code": "NAR1",
+    "elevation": 2299,
+    "label": "Motto Crostel",
+    "type": "WIND",
+    "manual": false,
+    "value": 0.949,
+    "timestamp": "2026-11-27T12:30:00Z",
+    "fill": "#fffff0"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     8.5219136101,
+     46.4911587325,
+     2101
+    ]
+   },
+   "properties": {
+    "network": "IMIS",
+    "code": "BED3",
+    "elevation": 2101,
+    "label": "Cassinello",
+    "type": "SNOW_FLAT",
+    "manual": false,
+    "value": -2.159,
+    "timestamp": "2026-11-27T12:30:00Z",
+    "fill": "#b7d0ed"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     8.6108477303,
+     46.5492576511,
+     2450
+    ]
+   },
+   "properties": {
+    "network": "IMIS",
+    "code": "VAL1",
+    "elevation": 2450,
+    "label": "L\u00f6ita",
+    "type": "WIND",
+    "manual": false,
+    "value": -1.056,
+    "timestamp": "2026-11-27T12:30:00Z",
+    "fill": "#b7d0ed"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     8.5194658263,
+     46.5388902709,
+     2963
+    ]
+   },
+   "properties": {
+    "network": "IMIS",
+    "code": "BED1",
+    "elevation": 2963,
+    "label": "Lucendro",
+    "type": "WIND",
+    "manual": false,
+    "value": -7.96,
+    "timestamp": "2026-11-27T12:30:00Z",
+    "fill": "#70a1ea"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     8.4909814117,
+     46.3062217779,
+     2179
+    ]
+   },
+   "properties": {
+    "network": "IMIS",
+    "code": "BOG3",
+    "elevation": 2179,
+    "label": "Bomb\u00f6gn Wind",
+    "type": "WIND",
+    "manual": false,
+    "value": -1.296,
+    "timestamp": "2026-11-27T12:30:00Z",
+    "fill": "#b7d0ed"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     8.9808234641,
+     46.4674553164,
+     2450
+    ]
+   },
+   "properties": {
+    "network": "IMIS",
+    "code": "SIM2",
+    "elevation": 2450,
+    "label": "Piano del Simano",
+    "type": "SNOW_FLAT",
+    "manual": false,
+    "value": -2.807,
+    "timestamp": "2026-11-27T12:30:00Z",
+    "fill": "#b7d0ed"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     8.7003813654,
+     46.4826950381,
+     2668
+    ]
+   },
+   "properties": {
+    "network": "IMIS",
+    "code": "CAM1",
+    "elevation": 2668,
+    "label": "Tremorgio",
+    "type": "WIND",
+    "manual": false,
+    "value": -5.95,
+    "timestamp": "2026-11-27T12:30:00Z",
+    "fill": "#70a1ea"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     8.4749541898,
+     46.2403989608,
+     2038
+    ]
+   },
+   "properties": {
+    "network": "IMIS",
+    "code": "VRG3",
+    "elevation": 2038,
+    "label": "Porcaresc",
+    "type": "SNOW_FLAT",
+    "manual": false,
+    "value": -3.441,
+    "timestamp": "2026-11-27T12:30:00Z",
+    "fill": "#b7d0ed"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     9.1602965296,
+     46.4140106135,
+     2384
+    ]
+   },
+   "properties": {
+    "network": "IMIS",
+    "code": "MES2",
+    "elevation": 2384,
+    "label": "Pian Grand",
+    "type": "SNOW_FLAT",
+    "manual": false,
+    "value": -5.731,
+    "timestamp": "2026-11-27T12:00:00Z",
+    "fill": "#70a1ea"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     8.971946227,
+     46.4625100549,
+     2579
+    ]
+   },
+   "properties": {
+    "network": "IMIS",
+    "code": "SIM1",
+    "elevation": 2579,
+    "label": "Cima del Simano",
+    "type": "WIND",
+    "manual": false,
+    "value": -4.605,
+    "timestamp": "2026-11-27T12:30:00Z",
+    "fill": "#b7d0ed"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     8.496417664,
+     46.5256303769,
+     2305
+    ]
+   },
+   "properties": {
+    "network": "IMIS",
+    "code": "BED4",
+    "elevation": 2305,
+    "label": "Sabbioni",
+    "type": "SNOW_FLAT",
+    "manual": false,
+    "value": -1.764,
+    "timestamp": "2026-11-27T12:30:00Z",
+    "fill": "#b7d0ed"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     8.8686355598,
+     46.4729905441,
+     2077
+    ]
+   },
+   "properties": {
+    "network": "IMIS",
+    "code": "NAR2",
+    "elevation": 2077,
+    "label": "Bassa di Nara",
+    "type": "SNOW_FLAT",
+    "manual": false,
+    "value": -0.906,
+    "timestamp": "2026-11-27T12:30:00Z",
+    "fill": "#fffff0"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     9.1556970675,
+     46.4174815167,
+     2688
+    ]
+   },
+   "properties": {
+    "network": "IMIS",
+    "code": "MES1",
+    "elevation": 2688,
+    "label": "Piz Pian Grand",
+    "type": "WIND",
+    "manual": false,
+    "value": -3.794,
+    "timestamp": "2026-11-27T12:00:00Z",
+    "fill": "#b7d0ed"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     8.917591252,
+     46.4087259824,
+     1884
+    ]
+   },
+   "properties": {
+    "network": "IMIS",
+    "code": "MTR2",
+    "elevation": 1884,
+    "label": "Predanass",
+    "type": "SNOW_FLAT",
+    "manual": false,
+    "value": 2.268,
+    "timestamp": "2026-11-27T12:30:00Z",
+    "fill": "#ffccc4"
+   }
+  }
+ ]
+}

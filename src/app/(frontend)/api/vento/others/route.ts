@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { WindStation, StationsResponse } from '../types'
 import { computeWindLevel, formatCloudBase, fetchWithTimeout, msToKmh } from '../types'
+import { fetchSLFStations } from '../slf'
 import { cachedFetch } from '../cache'
 import { rateLimit } from '@/lib/rate-limit'
 import { extractClientIp } from '@/lib/antispam'
@@ -71,85 +72,8 @@ async function fetchPWSStations(): Promise<(WindStation & { lat: number })[]> {
   return stations.filter((s) => !(s.windAvg === 0 && s.windDir === 0 && (s.windGust ?? 0) === 0))
 }
 
-// ── SLF (IMIS stations) ───────────────────────────────────────────────────
-const SLF_INFO_URL =
-  'https://public-meas-data.slf.ch/public/station-data/timepoint/TEMPERATURE_AIR/current/geojson'
-const SLF_DATA_URL =
-  'https://public-meas-data.slf.ch/public/station-data/timeseries/current/IMIS'
-
-const SLF_IDS = [
-  'BED1', 'MES1', 'CAM1', 'SIM1', 'VAL1', 'SIM2', 'BED2', 'MES2',
-  'NAR1', 'CAM2', 'MTR1', 'BED3', 'NAR2', 'DTR2', 'MTR2', 'BOG3', 'VRG3',
-]
-
-type SLFMeta = { lat: number; lon: number; elev: number; label: string }
-
-async function fetchSLFStations(): Promise<(WindStation & { lat: number })[]> {
-  const [infoResult, ...dataResults] = await Promise.allSettled([
-    fetchWithTimeout(SLF_INFO_URL).then((r) => r.json()),
-    ...SLF_IDS.map((id) =>
-      fetchWithTimeout(`${SLF_DATA_URL}/${id}`).then((r) => r.json()),
-    ),
-  ])
-
-  const metaMap = new Map<string, SLFMeta>()
-  if (infoResult.status === 'fulfilled' && infoResult.value?.features) {
-    for (const f of infoResult.value.features) {
-      const code = f.properties?.code
-      if (code) {
-        metaMap.set(code, {
-          lat: f.geometry?.coordinates?.[1] ?? 0,
-          lon: f.geometry?.coordinates?.[0] ?? 0,
-          elev: f.properties?.elevation ?? 0,
-          label: f.properties?.label ?? code,
-        })
-      }
-    }
-  }
-
-  const stations: (WindStation & { lat: number })[] = []
-
-  for (let i = 0; i < SLF_IDS.length; i++) {
-    const result = dataResults[i]
-    if (result.status !== 'fulfilled') continue
-
-    const data = result.value
-    const id = SLF_IDS[i]
-    const meta = metaMap.get(id)
-    if (!meta) continue
-
-    const windAvg = data?.windVelocityMean?.value != null
-      ? Math.round(data.windVelocityMean.value) : null
-    const windGust = data?.windVelocityMax?.value != null
-      ? Math.round(data.windVelocityMax.value) : null
-    const windDir = data?.windDirectionMean?.value != null
-      ? Math.round(data.windDirectionMean.value) : null
-    const temp = data?.temperatureAir?.value
-
-    if (windAvg == null && windGust == null) continue
-
-    const slfTimestamp = data?.windVelocityMean?.timestamp ?? data?.windVelocityMax?.timestamp
-    const obsTime = slfTimestamp ? new Date(slfTimestamp).getTime() : null
-
-    const label = meta.label.replace(/\s+\d{4,}$/, '')
-
-    stations.push({
-      name: `SLF-${label}`,
-      isPeak: meta.elev > 700,
-      windDir: windDir != null && windDir >= 0 && windDir <= 360 ? windDir : null,
-      windAvg,
-      windGust,
-      windLevel: computeWindLevel(windDir, windAvg, windGust),
-      temp: temp != null && Math.abs(temp) < 100 ? `${Math.round(temp)}°C` : null,
-      cloudBase: null,
-      lastUpdate: obsTime,
-      lat: meta.lat,
-      sourceUrl: `https://whiterisk.ch/en/conditions/measurements/station/IMIS/${id}`,
-    })
-  }
-
-  return stations
-}
+// ── SLF (IMIS stations) ──────────────────────────────────────────
+// Live station lookup and mapping live in ../slf.
 
 // ── Holfuy ─────────────────────────────────────────────────────────────────
 const HOLFUY_URL = 'http://widget.holfuy.com/?su=km/h&t=C&lang=en&mode=simple'
